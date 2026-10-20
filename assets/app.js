@@ -6816,7 +6816,7 @@ return (_ctx, _cache) => {
   return (r4(), ie("div", _hoisted_1$1, [
     _cache[9] || (_cache[9] = ia("div", { class: "page-head" }, [
       ia("h2", null, "更新日志"),
-      ia("p", null, "「读史记」的版本记录。当前为 v1.1，新增十表年表、汉书资料库、地图沙盘升级、批注体系与真实大模型问答。")
+      ia("p", null, "「读史记」的版本记录。当前为 v1.2：批注可直接写在正文上、沙盘接入地名与段落，并修复资料库返回等问题。")
     ], -1 /* CACHED */)),
     (r4(), ie(rQ, null, lj(entries, (e) => {
       return ia("div", {
