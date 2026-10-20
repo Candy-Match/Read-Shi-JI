@@ -1,0 +1,12 @@
+{
+  "name": "读史记 · 在线读《史记》",
+  "short_name": "读史记",
+  "description": "可对照、可追踪、可推演的《史记》阅读器",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#8b1d22",
+  "icons": [
+    { "src": "./favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
