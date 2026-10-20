@@ -653,3 +653,77 @@ input[type="range"] { accent-color: var(--accent); width: 130px; }
   .chapter-head h1 { font-size: 22px; }
   .text-orig, .text-trans { font-size: 17px; line-height: 1.95; }
 }
+
+/* ===== 年表 ===== */
+.tables-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 14px; align-items: start; }
+.table-wrap { max-height: 72vh; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.data-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 12.5px; }
+.data-table th {
+  position: sticky; top: 0; z-index: 2; background: var(--panel-2); color: var(--ink-2);
+  font-weight: 600; text-align: left; padding: 8px 9px; border-bottom: 1px solid var(--line);
+  white-space: nowrap; font-size: 12px; letter-spacing: .5px;
+}
+.data-table td { padding: 6px 9px; border-bottom: 1px dashed var(--line-2); vertical-align: top; line-height: 1.65; color: var(--ink-2); }
+.data-table tr:hover td { background: var(--accent-soft); }
+.data-table .col-year {
+  position: sticky; left: 0; z-index: 1; background: var(--panel); white-space: nowrap;
+  color: var(--ink); font-family: var(--serif); font-size: 12.5px; min-width: 92px;
+}
+.data-table th.col-year { z-index: 3; background: var(--panel-2); }
+.data-table td.has-link a { color: var(--accent); cursor: pointer; }
+.genealogy-row { display: flex; align-items: baseline; gap: 10px; padding: 5px 4px; border-bottom: 1px dashed var(--line-2); position: relative; }
+.genealogy-row::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--line-2); }
+.g-name { font-family: var(--serif); font-size: 14.5px; color: var(--ink); }
+.g-note { font-size: 11.5px; color: var(--muted); }
+@media (max-width: 900px) { .tables-layout { grid-template-columns: 1fr; } .tables-layout > aside { position: static !important; } }
+
+/* ===== 汉书资料对照 ===== */
+.hs-item { padding: 12px 0; border-bottom: 1px dashed var(--line-2); }
+.hs-item:last-child { border-bottom: none; }
+.hs-head { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--accent); margin-bottom: 6px; }
+.hs-head a { cursor: pointer; }
+.hs-orig { font-family: var(--serif); font-size: 15px; line-height: 1.95; color: var(--ink); }
+.hs-trans { font-family: var(--serif); font-size: 14px; line-height: 1.9; color: var(--ink-3); margin-top: 6px; padding-left: 10px; border-left: 2px solid var(--line-2); }
+
+/* 地图：鹰眼与阶段字幕 */
+.map-minimap { position: absolute; left: 10px; top: 10px; width: 156px; height: 86px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: color-mix(in srgb, var(--panel) 90%, transparent); }
+.map-minimap svg { display: block; width: 100%; height: 100%; }
+.map-caption {
+  position: absolute; left: 50%; top: 10px; transform: translateX(-50%);
+  background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line);
+  border-radius: 20px; padding: 5px 14px; font-size: 12.5px; color: var(--ink-2);
+  box-shadow: var(--shadow-sm); white-space: nowrap; max-width: 70%; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ===== 批注侧栏 ===== */
+.annot-panel {
+  width: 350px; flex: 0 0 350px; border-left: 1px solid var(--line); background: var(--panel);
+  display: flex; flex-direction: column; position: sticky; top: 54px; height: calc(100vh - 54px); align-self: flex-start;
+}
+.annot-item { padding: 10px 0; border-bottom: 1px dashed var(--line-2); }
+.annot-meta { display: flex; align-items: baseline; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.annot-quote {
+  font-family: var(--serif); font-size: 13.5px; line-height: 1.7; color: var(--ink);
+  padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 5px;
+}
+.annot-quote:hover { filter: brightness(.97); }
+.annot-note { font-size: 12.5px; line-height: 1.75; color: var(--ink-2); margin: 4px 0 6px; }
+.annot-edit { width: 100%; height: 68px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 7px 8px; font-size: 12.5px; background: var(--panel-2); color: var(--ink); outline: none; }
+.annot-actions { display: flex; gap: 4px; }
+@media (max-width: 1180px) { .annot-panel { position: fixed; right: 0; top: 54px; bottom: 0; z-index: 55; height: auto; box-shadow: var(--shadow); width: min(360px, 92vw); } }
+
+/* 批注侧栏统一为右侧浮层 */
+.annot-panel {
+  position: fixed; right: 0; top: 54px; bottom: 0; z-index: 56; width: 360px; max-width: 94vw;
+  height: auto; align-self: auto; box-shadow: -8px 0 24px rgba(43,38,28,.08);
+}
+@media (max-width: 900px) { .annot-panel { width: 92vw; } }
+
+/* 设置页分节标题 */
+.sec-title { font-family: var(--serif); font-size: 14px; color: var(--ink); margin: 6px 0 4px; letter-spacing: .5px; }
+
+/* ===== 更新日志 ===== */
+.log-item { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line-2); }
+.log-item:last-child { border-bottom: none; }
+.log-tag { display: inline-block; height: 20px; line-height: 18px; text-align: center; font-size: 11px; border: 1px solid currentColor; border-radius: 5px; }
+.log-title { font-family: var(--serif); font-size: 14.5px; color: var(--ink); letter-spacing: .3px; }
