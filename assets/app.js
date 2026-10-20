@@ -467,7 +467,11 @@ function renderParagraph(text, opts = {}) {
     }
     if (!s) out += seg;
     else if (s.kind === "note") out += `<span class="nref-wrap">${seg}<sup class="note-ref" data-note="${s.id}">${s.id}</sup></span>`;
-    else if (s.kind === "ann") out += `<span class="hl ${s.color}" data-ann="${s.id}">${seg}</span>`;
+    else if (s.kind === "ann") {
+      const meta = (annotations || []).find((a) => a.id === s.id);
+      const tip = meta && meta.note ? ` title="${esc$1(meta.note).replace(/"/g, "&quot;")}"` : "";
+      out += `<span class="hl ${s.color}" data-ann="${s.id}"${tip}>${seg}</span><span class="ann-mark" data-ann="${s.id}" title="查看批注">✎</span>`;
+    }
     else out += `<span class="e e-${s.kind}" data-ent="${s.kind}" data-id="${s.id}">${seg}</span>`;
     i = j;
   }
@@ -882,2433 +886,6 @@ return (_ctx, _cache) => {
 
 };
 
-const _hoisted_1$l = { class: "assistant" };
-const _hoisted_2$l = { class: "as-head" };
-const _hoisted_3$l = {
-  class: "as-tabs",
-  style: {"margin-left":"10px"}
-};
-const _hoisted_4$l = { class: "as-body" };
-const _hoisted_5$l = { key: 0 };
-const _hoisted_6$l = { class: "app-grid" };
-const _hoisted_7$l = ["onClick"];
-const _hoisted_8$l = { class: "ico" };
-const _hoisted_9$l = { class: "nm" };
-const _hoisted_10$k = { class: "ds" };
-const _hoisted_11$k = { class: "app-grid" };
-const _hoisted_12$k = {
-  key: 1,
-  style: {"padding":"14px"}
-};
-const _hoisted_13$j = { key: 0 };
-const _hoisted_14$i = { class: "card-title" };
-const _hoisted_15$g = { style: {"margin":"6px 0 10px"} };
-const _hoisted_16$f = { class: "tagline" };
-const _hoisted_17$e = { class: "tagline" };
-const _hoisted_18$d = {
-  key: 0,
-  class: "tagline"
-};
-const _hoisted_19$d = {
-  key: 0,
-  class: "kv"
-};
-const _hoisted_20$b = {
-  class: "desc",
-  style: {"margin":"10px 0"}
-};
-const _hoisted_21$b = { class: "rel-group-title" };
-const _hoisted_22$a = { class: "rel-list" };
-const _hoisted_23$a = ["onClick"];
-const _hoisted_24$9 = { class: "ty" };
-const _hoisted_25$8 = { class: "rel-list" };
-const _hoisted_26$8 = ["onClick"];
-const _hoisted_27$7 = { class: "rel-group-title" };
-const _hoisted_28$6 = { style: {"font-weight":"400"} };
-const _hoisted_29$6 = { style: {"max-height":"320px","overflow":"auto","margin-top":"6px"} };
-const _hoisted_30$6 = ["onClick"];
-const _hoisted_31$6 = { class: "mh" };
-const _hoisted_32$6 = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_33$5 = { class: "card-title" };
-const _hoisted_34$4 = { style: {"margin":"6px 0 10px"} };
-const _hoisted_35$4 = { class: "tagline" };
-const _hoisted_36$4 = { class: "tagline" };
-const _hoisted_37$3 = { class: "desc" };
-const _hoisted_38$3 = {
-  class: "kv",
-  style: {"margin-top":"8px"}
-};
-const _hoisted_39$3 = { class: "rel-list" };
-const _hoisted_40$2 = ["onClick"];
-const _hoisted_41$2 = { class: "rel-group-title" };
-const _hoisted_42$2 = { style: {"max-height":"260px","overflow":"auto"} };
-const _hoisted_43$2 = ["onClick"];
-const _hoisted_44$2 = { class: "mh" };
-const _hoisted_45$2 = { class: "card-title" };
-const _hoisted_46$2 = { style: {"margin":"6px 0 10px"} };
-const _hoisted_47$2 = { class: "tagline" };
-const _hoisted_48$2 = { class: "desc" };
-const _hoisted_49$2 = { class: "rel-list" };
-const _hoisted_50$2 = ["onClick"];
-const _hoisted_51$2 = {
-  key: 3,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_52$2 = {
-  key: 2,
-  class: "chat",
-  style: {"height":"100%"}
-};
-const _hoisted_53$1 = { style: {"display":"flex","align-items":"center","gap":"8px","padding":"7px 12px","border-bottom":"1px solid var(--line-2)","font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_54$1 = { class: "who" };
-const _hoisted_55$1 = { class: "bubble" };
-const _hoisted_56$1 = { style: {"white-space":"pre-line"} };
-const _hoisted_57$1 = ["onClick"];
-const _hoisted_58$1 = {
-  key: 0,
-  class: "msg"
-};
-const _hoisted_59$1 = { class: "chat-input" };
-const _hoisted_60$1 = ["onKeydown"];
-
-
-var Assistant = {
-  __name: 'Assistant',
-  setup(__props) {
-
-const tab = tx(store.assistantTab || "apps");
-ny(() => store.panel, (p) => { if (p) tab.value = "panel"; });
-ny(tab, (t) => (store.assistantTab = t));
-
-const panel = iD(() => store.panel);
-const person = iD(() => (panel.value?.type === "person" ? personById(panel.value.id) : null));
-const place = iD(() => (panel.value?.type === "place" ? placeById(panel.value.id) : null));
-const term = iD(() => (panel.value?.type === "term" ? termById(panel.value.id) : null));
-
-const relGroups = iD(() => {
-  if (!person.value) return [];
-  const groups = {};
-  for (const r of person.value.relations || []) {
-    const target = personById(r.target);
-    if (!target) continue;
-    (groups[r.type] = groups[r.type] || []).push({ ...r, target });
-  }
-  return Object.entries(groups).map(([type, list]) => ({ type, list }));
-});
-
-function openRel(id) { store.panel = { type: "person", id }; }
-
-/* 出场段落聚合（按需检索） */
-const mentions = tx([]);
-const mentionLoading = tx(false);
-ny([person, place, term], async () => {
-  mentions.value = [];
-  const target = person.value || place.value || term.value;
-  if (!target) return;
-  mentionLoading.value = true;
-  try {
-    if (!window.__searchIndex) window.__searchIndex = await fetchJSON("search.json");
-    const names = [target.name, ...(target.aliases || [])].filter(Boolean);
-    const out = [];
-    for (const row of window.__searchIndex) {
-      const o = plainText(row.o);
-      if (names.some((n) => o.includes(n))) {
-        out.push(row);
-        if (out.length >= 24) break;
-      }
-    }
-    mentions.value = out;
-  } catch (e) { mentions.value = []; }
-  mentionLoading.value = false;
-}, { immediate: true });
-
-const apps = [
-  { key: "people", ico: "人", nm: "人物志", ds: "数风流人物", go: "/people" },
-  { key: "map", ico: "圖", nm: "历史地图", ds: "左图右史", go: "/map" },
-  { key: "sandbox", ico: "沙", nm: "沙盘态势", ds: "历史空间观察与推演", go: "/sandbox" },
-  { key: "tables", ico: "表", nm: "十表年表", ds: "以表系年，观大势", go: "/tables" },
-  { key: "library", ico: "籍", nm: "资料库·汉书", ds: "与《史记》对读", go: "/library" },
-  { key: "events", ico: "事", nm: "纪事本末", ds: "按事件读史", go: "/events" },
-  { key: "poems", ico: "詩", nm: "咏史诗", ds: "后人如何看这段史", go: "/poems" },
-  { key: "decisions", ico: "决", nm: "决策演武场", ds: "参与历史关键抉择", go: "/decisions" },
-  { key: "climate", ico: "氣", nm: "历史气候", ds: "五千年气温曲线", go: "/climate" },
-  { key: "offices", ico: "官", nm: "历代官职", ds: "读懂权力结构", go: "/offices" },
-  { key: "lexicon", ico: "典", nm: "通鉴百科", ds: "制度与典故", go: "/lexicon" },
-  { key: "me", ico: "我", nm: "个人空间", ds: "批注与足迹", go: "/me" },
-];
-function nav(p) { go(p); }
-
-/* AI 问答（本地检索式） */
-const msgs = tx([
-  { who: "ai", text: "我是史记助手。可以直接问我：《史记》里鸿门宴是怎么回事？项羽为什么不肯过江东？韩信是怎样被杀的？" },
-]);
-const input = tx("");
-const busy = tx(false);
-const logEl = tx(null);
-
-async function ask() {
-  const q = input.value.trim();
-  if (!q || busy.value) return;
-  msgs.value.push({ who: "me", text: q });
-  input.value = "";
-  busy.value = true;
-  await t8();
-  logEl.value?.scrollTo({ top: 1e9 });
-
-  if (store.ai?.key) {
-    await askModel(q);
-  } else {
-    await askLocal(q);
-  }
-  busy.value = false;
-  await t8();
-  logEl.value?.scrollTo({ top: 1e9 });
-}
-
-/* 检索增强：取最相关的《史记》段落作为上下文 */
-async function retrieve(q, limit = 5) {
-  if (!window.__searchIndex) window.__searchIndex = await fetchJSON("search.json");
-  const grams = [...new Set(q.replace(/[，。？！、；：""''（）\s]/g, "").split("").filter((c) => /[\u4e00-\u9fa5]/.test(c)))];
-  const scored = [];
-  for (const row of window.__searchIndex) {
-    const o = plainText(row.o);
-    let sc = 0;
-    for (const g of grams) if (o.includes(g)) sc += 1;
-    if (q.length >= 2 && o.includes(q)) sc += 12;
-    if (sc >= Math.min(4, grams.length)) scored.push({ row, sc });
-  }
-  scored.sort((a, b) => b.sc - a.sc);
-  return scored.slice(0, limit).map((x) => x.row);
-}
-
-async function askLocal(q) {
-  try {
-    const top = await retrieve(q, 3);
-    const meta = (no) => store.index?.chapters.find((c) => c.no === no);
-    if (!top.length) {
-      msgs.value.push({ who: "ai", text: "没有在《史记》全文中找到足够相关的段落。可以换一组关键词；也可以在「阅读设置 → 史记助手」里填入大模型 API Key，让我真正作答。" });
-      return;
-    }
-    let text = `在《史记》中检索到相关记载，最相关的是：\n`;
-    top.forEach((row, i) => {
-      text += `\n${i + 1}. 卷${row.c}《${meta(row.c)?.title}》（${row.sec}）\n「${plainText(row.o).slice(0, 90)}…」`;
-    });
-    text += "\n\n（当前为本地检索模式；填入 API Key 后可直接对史料作答。）";
-    msgs.value.push({ who: "ai", text, srcs: top.map((row) => ({ no: row.c, p: row.p, label: `卷${row.c}《${meta(row.c)?.title}》第 ${row.p} 段` })) });
-  } catch (e) {
-    msgs.value.push({ who: "ai", text: "检索出错了：" + e.message });
-  }
-}
-
-async function askModel(q) {
-  const meta = (no) => store.index?.chapters.find((c) => c.no === no);
-  let ctx = "";
-  let srcs = [];
-  try {
-    const rows = await retrieve(q, 5);
-    srcs = rows.map((row) => ({ no: row.c, p: row.p, label: `卷${row.c}《${meta(row.c)?.title}》第 ${row.p} 段` }));
-    ctx = rows.map((row, i) => `【材料${i + 1}】《史记·${meta(row.c)?.title}》${row.sec}：${plainText(row.o).slice(0, 500)}`).join("\n");
-  } catch {}
-
-  const msg = { who: "ai", text: "", srcs };
-  msgs.value.push(msg);
-  const idx = msgs.value.length - 1;
-  const sys = "你是「读史记」网站的助手，熟读《史记》。回答用简洁的现代汉语，先给结论，再引原文为证；引用史料时标明篇名。不要编造原文，若材料不足就直说。";
-  const user = ctx ? `【检索到的《史记》材料】\n${ctx}\n\n【问题】${q}` : q;
-
-  try {
-    const res = await fetch(store.ai.endpoint, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${store.ai.key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: store.ai.model,
-        stream: true,
-        temperature: 0.3,
-        messages: [{ role: "system", content: sys }, { role: "user", content: user }],
-      }),
-    });
-    if (!res.ok || !res.body) throw new Error("HTTP " + res.status + " " + (await res.text().catch(() => "")).slice(0, 120));
-    const reader = res.body.getReader();
-    const dec = new TextDecoder();
-    let buf = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += dec.decode(value, { stream: true });
-      const lines = buf.split("\n");
-      buf = lines.pop() || "";
-      for (const line of lines) {
-        const t = line.trim();
-        if (!t.startsWith("data:")) continue;
-        const payload = t.slice(5).trim();
-        if (!payload || payload === "[DONE]") continue;
-        try {
-          const j = JSON.parse(payload);
-          const delta = j.choices?.[0]?.delta?.content || "";
-          if (delta) {
-            msgs.value[idx].text += delta;
-            await t8();
-            logEl.value?.scrollTo({ top: 1e9 });
-          }
-        } catch {}
-      }
-    }
-    if (!msgs.value[idx].text) msgs.value[idx].text = "（模型没有返回内容）";
-  } catch (e) {
-    msgs.value[idx].text = "调用模型失败：" + e.message + "\n可检查「阅读设置 → 史记助手」里的接口地址、模型名与 Key。";
-  }
-}
-
-function goto(no, p) { openChapter(no, p); }
-
-return (_ctx, _cache) => {
-  return (r4(), ie("aside", _hoisted_1$l, [
-    ia("div", _hoisted_2$l, [
-      _cache[12] || (_cache[12] = ia("b", { style: {"font-family":"var(--serif)","font-size":"15px"} }, "史记助手", -1 /* CACHED */)),
-      ia("div", _hoisted_3$l, [
-        ia("button", {
-          class: Y(["as-tab", { on: tab.value === 'apps' }]),
-          onClick: _cache[0] || (_cache[0] = $event => {tab.value = 'apps'; tA(store).panel = null;})
-        }, "应用", 2 /* CLASS */),
-        ia("button", {
-          class: Y(["as-tab", { on: tab.value === 'chat' }]),
-          onClick: _cache[1] || (_cache[1] = $event => (tab.value = 'chat'))
-        }, "问助手", 2 /* CLASS */),
-        (tA(store).panel)
-          ? (r4(), ie("button", {
-              key: 0,
-              class: Y(["as-tab", { on: tab.value === 'panel' }]),
-              onClick: _cache[2] || (_cache[2] = $event => (tab.value = 'panel'))
-            }, "详情", 2 /* CLASS */))
-          : ig("v-if", true)
-      ]),
-      ia("button", {
-        class: "icon-btn",
-        style: {"margin-left":"auto"},
-        title: "关闭",
-        onClick: _cache[3] || (_cache[3] = $event => (tA(store).assistant = false))
-      }, "✕")
-    ]),
-    ia("div", _hoisted_4$l, [
-      ig(" 应用宫格 "),
-      (tab.value === 'apps' && !tA(store).panel)
-        ? (r4(), ie("div", _hoisted_5$l, [
-            _cache[17] || (_cache[17] = ia("div", { class: "section-label" }, "应 用", -1 /* CACHED */)),
-            ia("div", _hoisted_6$l, [
-              (r4(), ie(rQ, null, lj(apps, (a) => {
-                return ia("div", {
-                  key: a.key,
-                  class: "app-item",
-                  onClick: $event => (nav(a.go))
-                }, [
-                  ia("div", _hoisted_8$l, ea(a.ico), 1 /* TEXT */),
-                  ia("div", null, [
-                    ia("div", _hoisted_9$l, ea(a.nm), 1 /* TEXT */),
-                    ia("div", _hoisted_10$k, ea(a.ds), 1 /* TEXT */)
-                  ])
-                ], 8 /* PROPS */, _hoisted_7$l)
-              }), 64 /* STABLE_FRAGMENT */))
-            ]),
-            _cache[18] || (_cache[18] = ia("div", { class: "section-label" }, "共 建", -1 /* CACHED */)),
-            ia("div", _hoisted_11$k, [
-              ia("div", {
-                class: "app-item",
-                onClick: _cache[4] || (_cache[4] = $event => (nav('/changelog')))
-              }, [...(_cache[13] || (_cache[13] = [
-                ia("div", { class: "ico" }, "更", -1 /* CACHED */),
-                ia("div", null, [
-                  ia("div", { class: "nm" }, "更新日志"),
-                  ia("div", { class: "ds" }, "v1.1 新增内容")
-                ], -1 /* CACHED */)
-              ]))]),
-              ia("div", {
-                class: "app-item",
-                onClick: _cache[5] || (_cache[5] = $event => (nav('/about')))
-              }, [...(_cache[14] || (_cache[14] = [
-                ia("div", { class: "ico" }, "计", -1 /* CACHED */),
-                ia("div", null, [
-                  ia("div", { class: "nm" }, "开发计划"),
-                  ia("div", { class: "ds" }, "待开发与已采纳")
-                ], -1 /* CACHED */)
-              ]))]),
-              ia("div", {
-                class: "app-item",
-                onClick: _cache[6] || (_cache[6] = $event => (nav('/about')))
-              }, [...(_cache[15] || (_cache[15] = [
-                ia("div", { class: "ico" }, "则", -1 /* CACHED */),
-                ia("div", null, [
-                  ia("div", { class: "nm" }, "读史记准则"),
-                  ia("div", { class: "ds" }, "编辑凡例")
-                ], -1 /* CACHED */)
-              ]))]),
-              ia("div", {
-                class: "app-item",
-                onClick: _cache[7] || (_cache[7] = $event => (nav('/about')))
-              }, [...(_cache[16] || (_cache[16] = [
-                ia("div", { class: "ico" }, "问", -1 /* CACHED */),
-                ia("div", null, [
-                  ia("div", { class: "nm" }, "常见问题"),
-                  ia("div", { class: "ds" }, "使用与版权")
-                ], -1 /* CACHED */)
-              ]))])
-            ]),
-            _cache[19] || (_cache[19] = ia("div", { style: {"padding":"6px 14px 18px","color":"var(--muted)","font-size":"11px","line-height":"1.7"} }, " 正文以中华书局点校本为参校，白话译文为编者们自撰。本站为研究性演示项目。 ", -1 /* CACHED */))
-          ]))
-        : ig("v-if", true),
-      ig(" 实体详情 "),
-      (tA(store).panel && tab.value !== 'chat')
-        ? (r4(), ie("div", _hoisted_12$k, [
-            ia("button", {
-              class: "chip ghost",
-              style: {"margin-bottom":"10px"},
-              onClick: _cache[8] || (_cache[8] = $event => {tA(store).panel = null; tab.value = 'apps';})
-            }, "← 返回应用"),
-            ig(" 人物 "),
-            (person.value)
-              ? (r4(), ie("div", _hoisted_13$j, [
-                  ia("div", _hoisted_14$i, ea(person.value.name), 1 /* TEXT */),
-                  ia("div", _hoisted_15$g, [
-                    ia("span", _hoisted_16$f, ea(person.value.dynasty), 1 /* TEXT */),
-                    ia("span", _hoisted_17$e, ea(person.value.identity), 1 /* TEXT */),
-                    (person.value.years)
-                      ? (r4(), ie("span", _hoisted_18$d, ea(person.value.years), 1 /* TEXT */))
-                      : ig("v-if", true)
-                  ]),
-                  (person.value.aliases?.length)
-                    ? (r4(), ie("div", _hoisted_19$d, [
-                        _cache[20] || (_cache[20] = ia("b", null, "别名", -1 /* CACHED */)),
-                        ia("span", null, ea(person.value.aliases.join("、")), 1 /* TEXT */)
-                      ]))
-                    : ig("v-if", true),
-                  ia("div", _hoisted_20$b, ea(person.value.desc), 1 /* TEXT */),
-                  _cache[22] || (_cache[22] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-                  (r4(true), ie(rQ, null, lj(relGroups.value, (g) => {
-                    return (r4(), ie("div", {
-                      class: "rel-group",
-                      key: g.type
-                    }, [
-                      ia("div", _hoisted_21$b, ea(g.type), 1 /* TEXT */),
-                      ia("div", _hoisted_22$a, [
-                        (r4(true), ie(rQ, null, lj(g.list, (r) => {
-                          return (r4(), ie("span", {
-                            key: r.target.id + r.type,
-                            class: "rel-pill",
-                            onClick: $event => (openRel(r.target.id))
-                          }, [
-                            id(ea(r.target.name), 1 /* TEXT */),
-                            ia("span", _hoisted_24$9, ea(r.label), 1 /* TEXT */)
-                          ], 8 /* PROPS */, _hoisted_23$a))
-                        }), 128 /* KEYED_FRAGMENT */))
-                      ])
-                    ]))
-                  }), 128 /* KEYED_FRAGMENT */)),
-                  _cache[23] || (_cache[23] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-                  _cache[24] || (_cache[24] = ia("div", { class: "rel-group-title" }, "相关篇目", -1 /* CACHED */)),
-                  ia("div", _hoisted_25$8, [
-                    (r4(true), ie(rQ, null, lj(person.value.chapters, (no) => {
-                      return (r4(), ie("span", {
-                        key: no,
-                        class: "rel-pill",
-                        onClick: $event => (goto(no))
-                      }, " 卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_26$8))
-                    }), 128 /* KEYED_FRAGMENT */))
-                  ]),
-                  _cache[25] || (_cache[25] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-                  ia("div", _hoisted_27$7, [
-                    _cache[21] || (_cache[21] = id(" 出现段落聚合 ", -1 /* CACHED */)),
-                    ia("span", _hoisted_28$6, "（" + ea(mentionLoading.value ? "检索中…" : mentions.value.length + " 段") + "）", 1 /* TEXT */)
-                  ]),
-                  ia("div", _hoisted_29$6, [
-                    (r4(true), ie(rQ, null, lj(mentions.value, (m) => {
-                      return (r4(), ie("div", {
-                        key: m.c + '-' + m.p,
-                        class: "mention",
-                        onClick: $event => (goto(m.c, m.p))
-                      }, [
-                        ia("div", _hoisted_31$6, "卷" + ea(m.c) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === m.c)?.title) + " · 第 " + ea(m.p) + " 段", 1 /* TEXT */),
-                        id(" " + ea(tA(plainText)(m.o).slice(0, 68)) + "… ", 1 /* TEXT */)
-                      ], 8 /* PROPS */, _hoisted_30$6))
-                    }), 128 /* KEYED_FRAGMENT */)),
-                    (!mentionLoading.value && !mentions.value.length)
-                      ? (r4(), ie("div", _hoisted_32$6, "未检索到出现段落"))
-                      : ig("v-if", true)
-                  ])
-                ]))
-              : (place.value)
-                ? (r4(), ie(rQ, { key: 1 }, [
-                    ig(" 地名 "),
-                    ia("div", null, [
-                      ia("div", _hoisted_33$5, ea(place.value.name), 1 /* TEXT */),
-                      ia("div", _hoisted_34$4, [
-                        ia("span", _hoisted_35$4, ea(place.value.type), 1 /* TEXT */),
-                        ia("span", _hoisted_36$4, "今 " + ea(place.value.modern), 1 /* TEXT */)
-                      ]),
-                      ia("div", _hoisted_37$3, ea(place.value.desc), 1 /* TEXT */),
-                      ia("div", _hoisted_38$3, [
-                        _cache[26] || (_cache[26] = ia("b", null, "坐标", -1 /* CACHED */)),
-                        ia("span", null, ea(place.value.lon) + ", " + ea(place.value.lat), 1 /* TEXT */)
-                      ]),
-                      ia("button", {
-                        class: "btn sm",
-                        style: {"margin-top":"10px"},
-                        onClick: _cache[9] || (_cache[9] = $event => (nav('/map')))
-                      }, "在地图中查看 →"),
-                      _cache[27] || (_cache[27] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-                      _cache[28] || (_cache[28] = ia("div", { class: "rel-group-title" }, "相关篇目", -1 /* CACHED */)),
-                      ia("div", _hoisted_39$3, [
-                        (r4(true), ie(rQ, null, lj(place.value.chapters, (no) => {
-                          return (r4(), ie("span", {
-                            key: no,
-                            class: "rel-pill",
-                            onClick: $event => (goto(no))
-                          }, "卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_40$2))
-                        }), 128 /* KEYED_FRAGMENT */))
-                      ]),
-                      _cache[29] || (_cache[29] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-                      ia("div", _hoisted_41$2, "出现段落聚合（" + ea(mentions.value.length) + " 段）", 1 /* TEXT */),
-                      ia("div", _hoisted_42$2, [
-                        (r4(true), ie(rQ, null, lj(mentions.value, (m) => {
-                          return (r4(), ie("div", {
-                            key: m.c + '-' + m.p,
-                            class: "mention",
-                            onClick: $event => (goto(m.c, m.p))
-                          }, [
-                            ia("div", _hoisted_44$2, "卷" + ea(m.c) + " · 第 " + ea(m.p) + " 段", 1 /* TEXT */),
-                            id(" " + ea(tA(plainText)(m.o).slice(0, 66)) + "… ", 1 /* TEXT */)
-                          ], 8 /* PROPS */, _hoisted_43$2))
-                        }), 128 /* KEYED_FRAGMENT */))
-                      ])
-                    ])
-                  ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
-                : (term.value)
-                  ? (r4(), ie(rQ, { key: 2 }, [
-                      ig(" 词条 "),
-                      ia("div", null, [
-                        ia("div", _hoisted_45$2, ea(term.value.term), 1 /* TEXT */),
-                        ia("div", _hoisted_46$2, [
-                          ia("span", _hoisted_47$2, ea(term.value.category), 1 /* TEXT */)
-                        ]),
-                        ia("div", _hoisted_48$2, ea(term.value.definition), 1 /* TEXT */),
-                        _cache[30] || (_cache[30] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-                        _cache[31] || (_cache[31] = ia("div", { class: "rel-group-title" }, "相关篇目", -1 /* CACHED */)),
-                        ia("div", _hoisted_49$2, [
-                          (r4(true), ie(rQ, null, lj(term.value.chapters, (no) => {
-                            return (r4(), ie("span", {
-                              key: no,
-                              class: "rel-pill",
-                              onClick: $event => (goto(no))
-                            }, "卷" + ea(no), 9 /* TEXT, PROPS */, _hoisted_50$2))
-                          }), 128 /* KEYED_FRAGMENT */))
-                        ])
-                      ])
-                    ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
-                  : (r4(), ie("div", _hoisted_51$2, "暂无该条目。"))
-          ]))
-        : ig("v-if", true),
-      ig(" AI 对话 "),
-      (tab.value === 'chat')
-        ? (r4(), ie("div", _hoisted_52$2, [
-            ia("div", _hoisted_53$1, [
-              ia("span", null, ea(tA(store).ai && tA(store).ai.key ? "已接入：" + tA(store).ai.model : "本地检索模式"), 1 /* TEXT */),
-              _cache[32] || (_cache[32] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-              ia("button", {
-                class: "chip ghost",
-                onClick: _cache[10] || (_cache[10] = $event => (tA(store).dialogue = { kind: 'settings' }))
-              }, "设置模型")
-            ]),
-            ia("div", {
-              class: "chat-log",
-              ref_key: "logEl",
-              ref: logEl
-            }, [
-              (r4(true), ie(rQ, null, lj(msgs.value, (m, i) => {
-                return (r4(), ie("div", {
-                  key: i,
-                  class: Y(["msg", { me: m.who === 'me' }])
-                }, [
-                  ia("div", _hoisted_54$1, ea(m.who === "me" ? "我" : "史"), 1 /* TEXT */),
-                  ia("div", _hoisted_55$1, [
-                    ia("div", _hoisted_56$1, ea(m.text), 1 /* TEXT */),
-                    (r4(true), ie(rQ, null, lj(m.srcs || [], (s, j) => {
-                      return (r4(), ie("a", {
-                        key: j,
-                        class: "src",
-                        onClick: $event => (goto(s.no, s.p))
-                      }, "↗ " + ea(s.label), 9 /* TEXT, PROPS */, _hoisted_57$1))
-                    }), 128 /* KEYED_FRAGMENT */))
-                  ])
-                ], 2 /* CLASS */))
-              }), 128 /* KEYED_FRAGMENT */)),
-              (busy.value)
-                ? (r4(), ie("div", _hoisted_58$1, [...(_cache[33] || (_cache[33] = [
-                    ia("div", { class: "who" }, "史", -1 /* CACHED */),
-                    ia("div", { class: "bubble" }, "正在翻检卷帙……", -1 /* CACHED */)
-                  ]))]))
-                : ig("v-if", true)
-            ], 512 /* NEED_PATCH */),
-            ia("div", _hoisted_59$1, [
-              nu(ia("textarea", {
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = $event => ((input).value = $event)),
-                placeholder: "向《史记》提问，如：项羽为何不肯过江东？",
-                onKeydown: oc(oa(ask, ["exact","prevent"]), ["enter"])
-              }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_60$1), [
-                [s4, input.value]
-              ]),
-              ia("button", {
-                class: "btn primary",
-                onClick: ask
-              }, "问")
-            ])
-          ]))
-        : ig("v-if", true)
-    ])
-  ]))
-}
-}
-
-};
-
-const _hoisted_1$k = {
-  class: "modal",
-  style: {"width":"560px"}
-};
-const _hoisted_2$k = { class: "modal-head" };
-const _hoisted_3$k = { class: "modal-body" };
-const _hoisted_4$k = { class: "setting-row" };
-const _hoisted_5$k = { class: "seg" };
-const _hoisted_6$k = ["onClick"];
-const _hoisted_7$k = { class: "setting-row" };
-const _hoisted_8$k = { class: "seg" };
-const _hoisted_9$k = { class: "setting-row" };
-const _hoisted_10$j = ["max", "value"];
-const _hoisted_11$j = { style: {"font-size":"12px","color":"var(--muted)"} };
-const _hoisted_12$j = { class: "setting-row" };
-const _hoisted_13$i = ["value"];
-const _hoisted_14$h = { style: {"font-size":"12px","color":"var(--muted)"} };
-const _hoisted_15$f = { class: "setting-row" };
-const _hoisted_16$e = { class: "seg" };
-const _hoisted_17$d = { class: "setting-row" };
-const _hoisted_18$c = { class: "seg" };
-const _hoisted_19$c = { class: "setting-row" };
-const _hoisted_20$a = { class: "seg" };
-const _hoisted_21$a = { class: "setting-row" };
-const _hoisted_22$9 = { class: "setting-row" };
-const _hoisted_23$9 = { class: "setting-row" };
-const _hoisted_24$8 = {
-  class: "setting-row",
-  style: {"border-bottom":"none"}
-};
-const _hoisted_25$7 = ["disabled"];
-const _hoisted_26$7 = { style: {"font-size":"12px","color":"var(--muted)"} };
-
-
-var SettingsModal = {
-  __name: 'SettingsModal',
-  emits: ["close"],
-  setup(__props) {
-
-
-const sizes = [16, 17, 18, 19, 20, 21, 22, 24];
-const modes = [
-  { k: "day", n: "日间" },
-  { k: "eye", n: "护眼" },
-  { k: "night", n: "夜间" },
-];
-function reset() {
-  Object.assign(store.settings, { mode: "day", font: "serif", size: 19, lineHeight: 2.05, layout: "dual", pinyin: false, showEntities: true });
-  toast("已恢复默认排版");
-}
-function clearAll() {
-  localStorage.removeItem("dushiji.state.v1");
-  location.reload();
-}
-
-const testing = tx(false);
-const testMsg = tx("");
-async function testAI() {
-  if (!store.ai.key) { testMsg.value = "请先填写 API Key"; return; }
-  testing.value = true;
-  testMsg.value = "";
-  try {
-    const r = await fetch(store.ai.endpoint, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${store.ai.key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: store.ai.model, messages: [{ role: "user", content: "只回复：连接成功" }], max_tokens: 16 }),
-    });
-    if (!r.ok) throw new Error("HTTP " + r.status + " " + (await r.text()).slice(0, 80));
-    const j = await r.json();
-    testMsg.value = "✓ " + (j.choices?.[0]?.message?.content || "连接成功").slice(0, 24);
-  } catch (e) {
-    testMsg.value = "✗ " + e.message.slice(0, 80);
-  }
-  testing.value = false;
-}
-
-return (_ctx, _cache) => {
-  return (r4(), ie("div", {
-    class: "overlay",
-    onClick: _cache[17] || (_cache[17] = oa($event => (_ctx.$emit('close')), ["self"]))
-  }, [
-    ia("div", _hoisted_1$k, [
-      ia("div", _hoisted_2$k, [
-        _cache[18] || (_cache[18] = ia("b", null, "阅读设置", -1 /* CACHED */)),
-        ia("button", {
-          class: "icon-btn",
-          style: {"margin-left":"auto"},
-          onClick: _cache[0] || (_cache[0] = $event => (_ctx.$emit('close')))
-        }, "✕")
-      ]),
-      ia("div", _hoisted_3$k, [
-        ia("div", _hoisted_4$k, [
-          _cache[19] || (_cache[19] = ia("span", { class: "lb" }, "阅读模式", -1 /* CACHED */)),
-          ia("div", _hoisted_5$k, [
-            (r4(), ie(rQ, null, lj(modes, (m) => {
-              return ia("button", {
-                key: m.k,
-                class: Y({ on: tA(store).settings.mode === m.k }),
-                onClick: $event => (tA(store).settings.mode = m.k)
-              }, ea(m.n), 11 /* TEXT, CLASS, PROPS */, _hoisted_6$k)
-            }), 64 /* STABLE_FRAGMENT */))
-          ])
-        ]),
-        ia("div", _hoisted_7$k, [
-          _cache[20] || (_cache[20] = ia("span", { class: "lb" }, "正文字体", -1 /* CACHED */)),
-          ia("div", _hoisted_8$k, [
-            ia("button", {
-              class: Y({ on: tA(store).settings.font === 'serif' }),
-              onClick: _cache[1] || (_cache[1] = $event => (tA(store).settings.font = 'serif'))
-            }, "宋体", 2 /* CLASS */),
-            ia("button", {
-              class: Y({ on: tA(store).settings.font === 'kai' }),
-              onClick: _cache[2] || (_cache[2] = $event => (tA(store).settings.font = 'kai'))
-            }, "楷体", 2 /* CLASS */),
-            ia("button", {
-              class: Y({ on: tA(store).settings.font === 'sans' }),
-              onClick: _cache[3] || (_cache[3] = $event => (tA(store).settings.font = 'sans'))
-            }, "黑体", 2 /* CLASS */)
-          ])
-        ]),
-        ia("div", _hoisted_9$k, [
-          _cache[21] || (_cache[21] = ia("span", { class: "lb" }, "字号", -1 /* CACHED */)),
-          ia("input", {
-            type: "range",
-            min: "0",
-            max: sizes.length - 1,
-            step: "1",
-            value: sizes.indexOf(tA(store).settings.size),
-            onInput: _cache[4] || (_cache[4] = $event => (tA(store).settings.size = sizes[$event.target.value]))
-          }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_10$j),
-          ia("span", _hoisted_11$j, ea(tA(store).settings.size) + "px", 1 /* TEXT */)
-        ]),
-        ia("div", _hoisted_12$j, [
-          _cache[22] || (_cache[22] = ia("span", { class: "lb" }, "行距", -1 /* CACHED */)),
-          ia("input", {
-            type: "range",
-            min: "1.6",
-            max: "2.6",
-            step: "0.05",
-            value: tA(store).settings.lineHeight,
-            onInput: _cache[5] || (_cache[5] = $event => (tA(store).settings.lineHeight = Number($event.target.value)))
-          }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_13$i),
-          ia("span", _hoisted_14$h, ea(tA(store).settings.lineHeight.toFixed(2)), 1 /* TEXT */)
-        ]),
-        ia("div", _hoisted_15$f, [
-          _cache[23] || (_cache[23] = ia("span", { class: "lb" }, "版式", -1 /* CACHED */)),
-          ia("div", _hoisted_16$e, [
-            ia("button", {
-              class: Y({ on: tA(store).settings.layout === 'dual' }),
-              onClick: _cache[6] || (_cache[6] = $event => (tA(store).settings.layout = 'dual'))
-            }, "文白对照", 2 /* CLASS */),
-            ia("button", {
-              class: Y({ on: tA(store).settings.layout === 'orig' }),
-              onClick: _cache[7] || (_cache[7] = $event => (tA(store).settings.layout = 'orig'))
-            }, "仅原文", 2 /* CLASS */),
-            ia("button", {
-              class: Y({ on: tA(store).settings.layout === 'trans' }),
-              onClick: _cache[8] || (_cache[8] = $event => (tA(store).settings.layout = 'trans'))
-            }, "仅译文", 2 /* CLASS */)
-          ])
-        ]),
-        ia("div", _hoisted_17$d, [
-          _cache[24] || (_cache[24] = ia("span", { class: "lb" }, "生僻字注音", -1 /* CACHED */)),
-          ia("div", _hoisted_18$c, [
-            ia("button", {
-              class: Y({ on: !tA(store).settings.pinyin }),
-              onClick: _cache[9] || (_cache[9] = $event => (tA(store).settings.pinyin = false))
-            }, "关闭", 2 /* CLASS */),
-            ia("button", {
-              class: Y({ on: tA(store).settings.pinyin }),
-              onClick: _cache[10] || (_cache[10] = $event => (tA(store).settings.pinyin = true))
-            }, "开启", 2 /* CLASS */)
-          ]),
-          _cache[25] || (_cache[25] = ia("span", { style: {"font-size":"11.5px","color":"var(--muted)"} }, "如「徇(xùn)齐」", -1 /* CACHED */))
-        ]),
-        ia("div", _hoisted_19$c, [
-          _cache[26] || (_cache[26] = ia("span", { class: "lb" }, "人物地名高亮", -1 /* CACHED */)),
-          ia("div", _hoisted_20$a, [
-            ia("button", {
-              class: Y({ on: !tA(store).settings.showEntities }),
-              onClick: _cache[11] || (_cache[11] = $event => (tA(store).settings.showEntities = false))
-            }, "关闭", 2 /* CLASS */),
-            ia("button", {
-              class: Y({ on: tA(store).settings.showEntities }),
-              onClick: _cache[12] || (_cache[12] = $event => (tA(store).settings.showEntities = true))
-            }, "开启", 2 /* CLASS */)
-          ]),
-          _cache[27] || (_cache[27] = ia("span", { style: {"font-size":"11.5px","color":"var(--muted)"} }, "点击可查看人物、地名、词条", -1 /* CACHED */))
-        ]),
-        ia("div", {
-          class: "setting-row",
-          style: {"border-bottom":"none"}
-        }, [
-          ia("button", {
-            class: "btn sm",
-            onClick: reset
-          }, "恢复默认"),
-          ia("button", {
-            class: "btn sm danger",
-            onClick: clearAll
-          }, "清除本站本地数据")
-        ]),
-        _cache[32] || (_cache[32] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-        _cache[33] || (_cache[33] = ia("div", { class: "sec-title" }, "史记助手 · 大模型", -1 /* CACHED */)),
-        _cache[34] || (_cache[34] = ia("div", {
-          class: "desc",
-          style: {"font-size":"12px","color":"var(--muted)","margin-bottom":"8px"}
-        }, " 填入任意 OpenAI 兼容接口即可让助手真正回答问题（推荐 DeepSeek）。Key 只保存在本机浏览器，不会上传到别处。 未填写时助手使用本地全文检索模式。 ", -1 /* CACHED */)),
-        ia("div", _hoisted_21$a, [
-          _cache[28] || (_cache[28] = ia("span", {
-            class: "lb",
-            style: {"min-width":"64px"}
-          }, "接口地址", -1 /* CACHED */)),
-          nu(ia("input", {
-            "onUpdate:modelValue": _cache[13] || (_cache[13] = $event => ((tA(store).ai.endpoint) = $event)),
-            class: "search-input",
-            style: {"flex":"1"},
-            placeholder: "https://api.deepseek.com/v1/chat/completions"
-          }, null, 512 /* NEED_PATCH */), [
-            [s4, tA(store).ai.endpoint]
-          ])
-        ]),
-        ia("div", _hoisted_22$9, [
-          _cache[29] || (_cache[29] = ia("span", {
-            class: "lb",
-            style: {"min-width":"64px"}
-          }, "模型名", -1 /* CACHED */)),
-          nu(ia("input", {
-            "onUpdate:modelValue": _cache[14] || (_cache[14] = $event => ((tA(store).ai.model) = $event)),
-            class: "search-input",
-            style: {"flex":"1"},
-            placeholder: "deepseek-chat"
-          }, null, 512 /* NEED_PATCH */), [
-            [s4, tA(store).ai.model]
-          ])
-        ]),
-        ia("div", _hoisted_23$9, [
-          _cache[30] || (_cache[30] = ia("span", {
-            class: "lb",
-            style: {"min-width":"64px"}
-          }, "API Key", -1 /* CACHED */)),
-          nu(ia("input", {
-            "onUpdate:modelValue": _cache[15] || (_cache[15] = $event => ((tA(store).ai.key) = $event)),
-            type: "password",
-            class: "search-input",
-            style: {"flex":"1"},
-            placeholder: "sk-...",
-            autocomplete: "off"
-          }, null, 512 /* NEED_PATCH */), [
-            [s4, tA(store).ai.key]
-          ])
-        ]),
-        ia("div", _hoisted_24$8, [
-          ia("button", {
-            class: "btn sm",
-            onClick: testAI,
-            disabled: testing.value
-          }, ea(testing.value ? "测试中…" : "测试连接"), 9 /* TEXT, PROPS */, _hoisted_25$7),
-          ia("span", _hoisted_26$7, ea(testMsg.value), 1 /* TEXT */),
-          _cache[31] || (_cache[31] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-          ia("button", {
-            class: "btn sm danger",
-            onClick: _cache[16] || (_cache[16] = $event => {tA(store).ai.key = ''; testMsg.value = '已清除 Key';})
-          }, "清除 Key")
-        ])
-      ])
-    ])
-  ]))
-}
-}
-
-};
-
-const _hoisted_1$j = { class: "modal" };
-const _hoisted_2$j = { class: "modal-head" };
-const _hoisted_3$j = { key: 0 };
-const _hoisted_4$j = { key: 1 };
-const _hoisted_5$j = { key: 2 };
-const _hoisted_6$j = { key: 3 };
-const _hoisted_7$j = { class: "modal-body" };
-const _hoisted_8$j = {
-  class: "desc",
-  style: {"font-family":"var(--serif)","font-size":"15px","color":"var(--ink)"}
-};
-const _hoisted_9$j = {
-  key: 0,
-  class: "desc",
-  style: {"margin-top":"10px"}
-};
-const _hoisted_10$i = { style: {"display":"flex","gap":"8px","margin-top":"16px"} };
-const _hoisted_11$i = { style: {"font-family":"var(--serif)"} };
-const _hoisted_12$i = {
-  class: "desc",
-  style: {"margin-top":"4px"}
-};
-const _hoisted_13$h = { style: {"display":"flex","align-items":"baseline","gap":"8px"} };
-const _hoisted_14$g = { style: {"font-family":"var(--serif)","font-size":"16px"} };
-const _hoisted_15$e = { style: {"font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_16$d = {
-  class: "poem",
-  style: {"margin-top":"6px"}
-};
-const _hoisted_17$c = {
-  class: "desc",
-  style: {"margin-top":"6px","color":"var(--ink-3)"}
-};
-
-
-var DialogueHost = {
-  __name: 'DialogueHost',
-  setup(__props) {
-
-const d = iD(() => store.dialogue);
-function close() { store.dialogue = null; }
-function del(a) {
-  removeAnnotation(a.id);
-  store.toast = "批注已删除";
-  setTimeout(() => (store.toast = ""), 1600);
-  close();
-}
-
-return (_ctx, _cache) => {
-  return (d.value && d.value.kind !== 'settings')
-    ? (r4(), ie("div", {
-        key: 0,
-        class: "overlay",
-        onClick: oa(close, ["self"])
-      }, [
-        ia("div", _hoisted_1$j, [
-          ia("div", _hoisted_2$j, [
-            (d.value.kind === 'annotation')
-              ? (r4(), ie("b", _hoisted_3$j, "我的批注"))
-              : (d.value.kind === 'notes')
-                ? (r4(), ie("b", _hoisted_4$j, "注释"))
-                : (d.value.kind === 'poems')
-                  ? (r4(), ie("b", _hoisted_5$j, "后人咏史"))
-                  : (r4(), ie("b", _hoisted_6$j, "详情")),
-            ia("button", {
-              class: "icon-btn",
-              style: {"margin-left":"auto"},
-              onClick: close
-            }, "✕")
-          ]),
-          ia("div", _hoisted_7$j, [
-            (d.value.kind === 'annotation')
-              ? (r4(), ie(rQ, { key: 0 }, [
-                  ia("div", _hoisted_8$j, " 「" + ea(d.value.data.quote) + "」 ", 1 /* TEXT */),
-                  (d.value.data.note)
-                    ? (r4(), ie("div", _hoisted_9$j, "批注：" + ea(d.value.data.note), 1 /* TEXT */))
-                    : ig("v-if", true),
-                  ia("div", _hoisted_10$i, [
-                    ia("button", {
-                      class: "btn sm",
-                      onClick: _cache[0] || (_cache[0] = $event => {tA(go)(`/c/${d.value.data.chapter}/${d.value.data.para}`); close();})
-                    }, "定位到原文"),
-                    _cache[2] || (_cache[2] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-                    ia("button", {
-                      class: "btn sm danger",
-                      onClick: _cache[1] || (_cache[1] = $event => (del(d.value.data)))
-                    }, "删除批注")
-                  ])
-                ], 64 /* STABLE_FRAGMENT */))
-              : (d.value.kind === 'notes')
-                ? (r4(true), ie(rQ, { key: 1 }, lj(d.value.data, (n) => {
-                    return (r4(), ie("div", {
-                      key: n.n,
-                      style: {"padding":"8px 0","border-bottom":"1px dashed var(--line-2)"}
-                    }, [
-                      ia("b", _hoisted_11$i, ea(n.n) + ". " + ea(n.term), 1 /* TEXT */),
-                      ia("div", _hoisted_12$i, ea(n.text), 1 /* TEXT */)
-                    ]))
-                  }), 128 /* KEYED_FRAGMENT */))
-                : (d.value.kind === 'poems')
-                  ? (r4(true), ie(rQ, { key: 2 }, lj(d.value.data, (p) => {
-                      return (r4(), ie("div", {
-                        key: p.id,
-                        style: {"padding":"12px 0","border-bottom":"1px dashed var(--line-2)"}
-                      }, [
-                        ia("div", _hoisted_13$h, [
-                          ia("b", _hoisted_14$g, ea(p.title), 1 /* TEXT */),
-                          ia("span", _hoisted_15$e, ea(p.dynasty) + " · " + ea(p.author), 1 /* TEXT */)
-                        ]),
-                        ia("div", _hoisted_16$d, [
-                          (r4(true), ie(rQ, null, lj(p.lines, (l, i) => {
-                            return (r4(), ie("span", {
-                              key: i,
-                              class: "l"
-                            }, ea(l), 1 /* TEXT */))
-                          }), 128 /* KEYED_FRAGMENT */))
-                        ]),
-                        ia("div", _hoisted_17$c, ea(p.note), 1 /* TEXT */)
-                      ]))
-                    }), 128 /* KEYED_FRAGMENT */))
-                  : ig("v-if", true)
-          ])
-        ])
-      ]))
-    : ig("v-if", true)
-}
-}
-
-};
-
-// 极简 Markdown 渲染（标题 / 粗体 / 列表 / 引用 / 段落 / [[篇名]] 链接文本）
-const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-function renderMD(md) {
-  if (!md) return "";
-  const lines = md.replace(/\r/g, "").split("\n");
-  const out = [];
-  let inUl = false;
-  const closeUl = () => { if (inUl) { out.push("</ul>"); inUl = false; } };
-
-  for (let raw of lines) {
-    const line = raw.trimEnd();
-    if (!line.trim()) { closeUl(); continue; }
-
-    const h = line.match(/^(#{1,5})\s+(.+)$/);
-    if (h) {
-      closeUl();
-      const lv = Math.min(5, h[1].length + 2);
-      out.push(`<h${lv} class="md-h">${inline(h[2])}</h${lv}>`);
-      continue;
-    }
-    const li = line.match(/^\s*[-*]\s+(.+)$/);
-    if (li) {
-      if (!inUl) { out.push('<ul class="md-ul">'); inUl = true; }
-      out.push(`<li>${inline(li[1])}</li>`);
-      continue;
-    }
-    if (/^>\s?/.test(line)) {
-      closeUl();
-      out.push(`<blockquote class="md-q">${inline(line.replace(/^>\s?/, ""))}</blockquote>`);
-      continue;
-    }
-    if (/^[-*_]{3,}$/.test(line.trim())) { closeUl(); out.push("<hr />"); continue; }
-    closeUl();
-    out.push(`<p class="md-p">${inline(line)}</p>`);
-  }
-  closeUl();
-  return out.join("");
-}
-
-function inline(s) {
-  let t = esc(s);
-  t = t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
-  t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
-  t = t.replace(/\[\[(.+?)\]\]/g, "$1");
-  t = t.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
-  return t;
-}
-
-const _hoisted_1$i = { class: "annot-panel" };
-const _hoisted_2$i = { class: "as-head" };
-const _hoisted_3$i = { style: {"font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_4$i = { style: {"padding":"8px 12px","display":"flex","gap":"6px","flex-wrap":"wrap","border-bottom":"1px solid var(--line-2)"} };
-const _hoisted_5$i = {
-  class: "as-body",
-  style: {"padding":"10px 12px"}
-};
-const _hoisted_6$i = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_7$i = { class: "annot-meta" };
-const _hoisted_8$i = { style: {"margin-left":"auto","font-size":"10.5px","color":"var(--muted)"} };
-const _hoisted_9$i = ["onClick"];
-const _hoisted_10$h = { style: {"display":"flex","gap":"6px","margin-top":"6px"} };
-const _hoisted_11$h = ["onClick"];
-const _hoisted_12$h = {
-  key: 0,
-  class: "annot-note"
-};
-const _hoisted_13$g = { class: "annot-actions" };
-const _hoisted_14$f = ["onClick"];
-const _hoisted_15$d = ["onClick"];
-const _hoisted_16$c = ["onClick"];
-
-
-var AnnotationPanel = {
-  __name: 'AnnotationPanel',
-  props: { chapter: { type: Number, default: 1 } },
-  emits: ["close"],
-  setup(__props, { emit: __emit }) {
-
-const props = __props;
-const emit = __emit;
-
-const scope = tx("chapter");
-const editing = tx(null);
-const editText = tx("");
-
-const list = iD(() => {
-  const all = [...store.annotations].sort((a, b) => (a.chapter - b.chapter) || (a.para - b.para));
-  if (scope.value === "chapter") return all.filter((a) => a.chapter === props.chapter);
-  return all;
-});
-
-const titleOf = (no) => store.index?.chapters.find((c) => c.no === Number(no))?.title || "";
-
-function jump(a) {
-  go(`/c/${a.chapter}/${a.para}`);
-}
-function startEdit(a) {
-  editing.value = a.id;
-  editText.value = a.note || "";
-}
-function saveEdit(a) {
-  updateAnnotation(a.id, { note: editText.value.trim() });
-  editing.value = null;
-  editText.value = "";
-}
-function del(a) {
-  removeAnnotation(a.id);
-  toast("批注已删除");
-}
-
-function exportJSON() {
-  const data = JSON.stringify({ version: 1, annotations: store.annotations }, null, 2);
-  const blob = new Blob([data], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `读史记-批注-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast("已导出批注");
-}
-
-const fileEl = tx(null);
-function importJSON(e) {
-  const f = e.target.files?.[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const obj = JSON.parse(String(reader.result));
-      const arr = Array.isArray(obj) ? obj : obj.annotations || [];
-      const valid = arr.filter((x) => x && x.chapter && x.para && x.quote);
-      const exist = new Set(store.annotations.map((a) => a.chapter + ":" + a.para + ":" + a.quote));
-      const add = valid.filter((x) => !exist.has(x.chapter + ":" + x.para + ":" + x.quote));
-      store.annotations = [...store.annotations, ...add.map((x) => ({ id: "a" + Math.random().toString(36).slice(2), ts: Date.now(), color: x.color || "hl-y", ...x }))];
-      toast(`导入 ${add.length} 条批注`);
-    } catch (err) {
-      toast("导入失败：文件格式不对");
-    }
-  };
-  reader.readAsText(f);
-  e.target.value = "";
-}
-
-return (_ctx, _cache) => {
-  return (r4(), ie("aside", _hoisted_1$i, [
-    ia("div", _hoisted_2$i, [
-      _cache[6] || (_cache[6] = ia("b", { style: {"font-family":"var(--serif)","font-size":"15px"} }, "批注", -1 /* CACHED */)),
-      ia("span", _hoisted_3$i, ea(list.value.length) + " 条", 1 /* TEXT */),
-      ia("button", {
-        class: "icon-btn",
-        style: {"margin-left":"auto"},
-        onClick: _cache[0] || (_cache[0] = $event => (emit('close')))
-      }, "✕")
-    ]),
-    ia("div", _hoisted_4$i, [
-      ia("button", {
-        class: Y(["filter-pill", { on: scope.value === 'chapter' }]),
-        onClick: _cache[1] || (_cache[1] = $event => (scope.value = 'chapter'))
-      }, "本篇", 2 /* CLASS */),
-      ia("button", {
-        class: Y(["filter-pill", { on: scope.value === 'all' }]),
-        onClick: _cache[2] || (_cache[2] = $event => (scope.value = 'all'))
-      }, "全部", 2 /* CLASS */),
-      _cache[7] || (_cache[7] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-      ia("button", {
-        class: "chip ghost",
-        onClick: exportJSON
-      }, "导出"),
-      ia("button", {
-        class: "chip ghost",
-        onClick: _cache[3] || (_cache[3] = $event => (fileEl.value.click()))
-      }, "导入"),
-      ia("input", {
-        ref_key: "fileEl",
-        ref: fileEl,
-        type: "file",
-        accept: "application/json",
-        style: {"display":"none"},
-        onChange: importJSON
-      }, null, 544 /* NEED_HYDRATION, NEED_PATCH */)
-    ]),
-    ia("div", _hoisted_5$i, [
-      (!list.value.length)
-        ? (r4(), ie("div", _hoisted_6$i, " 还没有批注。阅读时选中原文，即可划线并写下批注；批注会实时显示在正文中，并汇总在这里。 "))
-        : ig("v-if", true),
-      (r4(true), ie(rQ, null, lj(list.value, (a) => {
-        return (r4(), ie("div", {
-          key: a.id,
-          class: "annot-item"
-        }, [
-          ia("div", _hoisted_7$i, [
-            ia("span", null, "卷" + ea(a.chapter) + " · " + ea(titleOf(a.chapter)) + " · 第 " + ea(a.para) + " 段", 1 /* TEXT */),
-            ia("span", _hoisted_8$i, ea(new Date(a.ts).toLocaleDateString("zh-CN")), 1 /* TEXT */)
-          ]),
-          ia("div", {
-            class: Y(["annot-quote", a.color]),
-            onClick: $event => (jump(a))
-          }, "「" + ea(a.quote) + "」", 11 /* TEXT, CLASS, PROPS */, _hoisted_9$i),
-          (editing.value === a.id)
-            ? (r4(), ie(rQ, { key: 0 }, [
-                nu(ia("textarea", {
-                  "onUpdate:modelValue": _cache[4] || (_cache[4] = $event => ((editText).value = $event)),
-                  class: "annot-edit",
-                  placeholder: "批注内容"
-                }, null, 512 /* NEED_PATCH */), [
-                  [s4, editText.value]
-                ]),
-                ia("div", _hoisted_10$h, [
-                  ia("button", {
-                    class: "btn sm primary",
-                    onClick: $event => (saveEdit(a))
-                  }, "保存", 8 /* PROPS */, _hoisted_11$h),
-                  ia("button", {
-                    class: "btn sm",
-                    onClick: _cache[5] || (_cache[5] = $event => (editing.value = null))
-                  }, "取消")
-                ])
-              ], 64 /* STABLE_FRAGMENT */))
-            : (r4(), ie(rQ, { key: 1 }, [
-                (a.note)
-                  ? (r4(), ie("div", _hoisted_12$h, ea(a.note), 1 /* TEXT */))
-                  : ig("v-if", true),
-                ia("div", _hoisted_13$g, [
-                  ia("button", {
-                    class: "chip ghost",
-                    onClick: $event => (jump(a))
-                  }, "定位", 8 /* PROPS */, _hoisted_14$f),
-                  ia("button", {
-                    class: "chip ghost",
-                    onClick: $event => (startEdit(a))
-                  }, ea(a.note ? "编辑" : "补写"), 9 /* TEXT, PROPS */, _hoisted_15$d),
-                  ia("button", {
-                    class: "chip ghost",
-                    onClick: $event => (del(a))
-                  }, "删除", 8 /* PROPS */, _hoisted_16$c)
-                ])
-              ], 64 /* STABLE_FRAGMENT */))
-        ]))
-      }), 128 /* KEYED_FRAGMENT */))
-    ])
-  ]))
-}
-}
-
-};
-
-const _hoisted_1$h = { class: "reader-bar" };
-const _hoisted_2$h = { class: "crumb" };
-const _hoisted_3$h = { style: {"font-size":"11.5px"} };
-const _hoisted_4$h = { class: "reader-tools" };
-const _hoisted_5$h = {
-  class: "seg",
-  title: "版式"
-};
-const _hoisted_6$h = { class: "reading" };
-const _hoisted_7$h = { class: "chapter-head" };
-const _hoisted_8$h = { class: "cat" };
-const _hoisted_9$h = { class: "meta" };
-const _hoisted_10$g = { key: 0 };
-const _hoisted_11$g = { key: 1 };
-const _hoisted_12$g = {
-  key: 0,
-  class: "panel",
-  style: {"margin-bottom":"22px"}
-};
-const _hoisted_13$f = { class: "panel-head" };
-const _hoisted_14$e = {
-  key: 0,
-  class: "panel-body"
-};
-const _hoisted_15$c = {
-  class: "desc",
-  style: {"white-space":"pre-line"}
-};
-const _hoisted_16$b = {
-  class: "para-chips",
-  style: {"margin-top":"12px"}
-};
-const _hoisted_17$b = ["onClick"];
-const _hoisted_18$b = ["onClick"];
-const _hoisted_19$b = ["id"];
-const _hoisted_20$9 = {
-  key: 0,
-  class: "para-sec"
-};
-const _hoisted_21$9 = { class: "para-chips" };
-const _hoisted_22$8 = ["onClick"];
-const _hoisted_23$8 = ["onClick"];
-const _hoisted_24$7 = ["onClick"];
-const _hoisted_25$6 = ["onClick"];
-const _hoisted_26$6 = ["onClick"];
-const _hoisted_27$6 = {
-  class: "para-no",
-  style: {"position":"static"}
-};
-const _hoisted_28$5 = { class: "pcols" };
-const _hoisted_29$5 = { class: "para" };
-const _hoisted_30$5 = ["innerHTML"];
-const _hoisted_31$5 = { class: "para" };
-const _hoisted_32$5 = {
-  key: 0,
-  class: "text-trans"
-};
-const _hoisted_33$4 = {
-  key: 1,
-  class: "text-trans",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_34$3 = {
-  key: 1,
-  class: "desc",
-  style: {"text-align":"center","padding":"60px","color":"var(--muted)"}
-};
-const _hoisted_35$3 = {
-  key: 2,
-  style: {"margin-top":"34px"}
-};
-const _hoisted_36$3 = { class: "panel-head" };
-const _hoisted_37$2 = { class: "panel-body" };
-const _hoisted_38$2 = ["innerHTML"];
-const _hoisted_39$2 = {
-  class: "panel",
-  style: {"margin-top":"20px"}
-};
-const _hoisted_40$1 = { class: "panel-head" };
-const _hoisted_41$1 = { style: {"margin-left":"auto","font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_42$1 = {
-  key: 0,
-  class: "panel-body"
-};
-const _hoisted_43$1 = { style: {"font-family":"var(--serif)","color":"var(--ink)"} };
-const _hoisted_44$1 = { class: "desc" };
-const _hoisted_45$1 = { style: {"display":"flex","gap":"10px","margin-top":"26px","flex-wrap":"wrap"} };
-const _hoisted_46$1 = { style: {"font-family":"var(--serif)","font-size":"13px","color":"var(--ink-2)","max-height":"54px","overflow":"hidden"} };
-const _hoisted_47$1 = { class: "row" };
-const _hoisted_48$1 = ["onClick"];
-const _hoisted_49$1 = { style: {"font-size":"11px","color":"var(--muted)","margin-bottom":"4px"} };
-const _hoisted_50$1 = { style: {"font-family":"var(--serif)"} };
-const _hoisted_51$1 = {
-  class: "desc",
-  style: {"margin-top":"6px"}
-};
-const _hoisted_52$1 = {
-  class: "modal",
-  style: {"width":"680px"}
-};
-const _hoisted_53 = { class: "modal-head" };
-const _hoisted_54 = { class: "modal-body" };
-const _hoisted_55 = { style: {"display":"flex","gap":"8px","align-items":"center","margin-bottom":"6px"} };
-const _hoisted_56 = {
-  class: "vip-tag",
-  style: {"background":"var(--accent-soft)","color":"var(--accent)"}
-};
-const _hoisted_57 = { style: {"font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_58 = {
-  class: "mini-pill",
-  style: {"margin-left":"auto"}
-};
-const _hoisted_59 = {
-  class: "desc",
-  style: {"font-family":"var(--serif)","font-size":"14px","line-height":"1.9"}
-};
-const _hoisted_60 = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_61 = {
-  class: "modal",
-  style: {"width":"820px"}
-};
-const _hoisted_62 = { class: "modal-head" };
-const _hoisted_63 = { style: {"font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_64 = { class: "modal-body" };
-const _hoisted_65 = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_66 = { class: "hs-head" };
-const _hoisted_67 = ["onClick"];
-const _hoisted_68 = { class: "hs-orig" };
-const _hoisted_69 = {
-  key: 0,
-  class: "hs-trans"
-};
-
-
-var ReaderView = {
-  __name: 'ReaderView',
-  props: { route: { type: Object, required: true } },
-  setup(__props) {
-
-const props = __props;
-
-const annotText = tx("");
-const annotColor = tx("hl-y");
-const winW = tx(typeof window !== "undefined" ? window.innerWidth : 1200);
-const onResize = () => { winW.value = window.innerWidth; };
-
-const matcher = iD(() => buildMatcher(store.entities));
-const renderCache = new Map();
-const showIntro = tx(true);
-const notesOpen = tx(false);
-const companionsOpen = tx(false);
-const annotOpen = tx(false);
-const myAnnots = iD(() => store.annotations.filter((a) => a.chapter === Number(props.route.no)));
-const sel = tx(null);
-const notePop = tx(null);
-
-const chapter = iD(() => store.chapter);
-const paras = iD(() => chapter.value?.paras || []);
-const notes = iD(() => chapter.value?.notes || []);
-const meta = iD(() => store.index?.chapters.find((c) => c.no === Number(props.route.no)));
-const companions = iD(() => (store.companions?.companions || []).filter((c) => c.chapter === Number(props.route.no)));
-const poems = iD(() => (store.poems?.poems || []).filter((p) => (p.chapters || []).includes(Number(props.route.no))));
-const campaigns = iD(() => (store.campaigns?.campaigns || []).filter((c) => Number(c.chapter) === Number(props.route.no)));
-
-/* 《汉书》资料对照 */
-const hsLinks = iD(() => (store.hanshuLinks?.links || {})[Number(props.route.no)] || {});
-const hsMap = iD(() => (store.hanshuMap?.map || []).filter((m) => m.shiji === Number(props.route.no)));
-const hsTitle = (id) => (store.hanshuIndex?.chapters || []).find((c) => c.id === id)?.title || id;
-const hsDrawer = tx(null);
-const hsLoading = tx(false);
-async function openHanshu(pi) {
-  const arr = hsLinks.value[pi] || [];
-  if (!arr.length) return;
-  hsLoading.value = true;
-  hsDrawer.value = { items: [], para: pi };
-  const items = [];
-  for (const l of arr) {
-    try {
-      const ch = await loadHanshuText(l.h);
-      items.push({ id: l.h, p: l.p, title: ch.title, text: ch.paras[l.p] || "", trans: (ch.trans || [])[l.p] || "" });
-    } catch {}
-  }
-  hsDrawer.value = { items, para: pi };
-  hsLoading.value = false;
-}
-
-function entitiesIn(text) {
-  const m = matcher.value;
-  if (!m || !m.re) return [];
-  m.re.lastIndex = 0;
-  const found = new Map();
-  const plain = plainText(text);
-  let hit;
-  while ((hit = m.re.exec(plain))) {
-    const ent = m.map.get(hit[0]);
-    if (ent) found.set(ent.id, ent);
-  }
-  return [...found.values()];
-}
-function personsIn(text) {
-  return entitiesIn(text).filter((x) => x.type === "person");
-}
-function notesIn(text) {
-  const plain = plainText(text);
-  return notes.value.filter((n) => {
-    const t = (n.term || "").split(/[、，,／/]/)[0].trim();
-    return t && t.length >= 2 && plain.includes(t);
-  });
-}
-function isTaishi(sec) { return !!sec && sec.indexOf("太史公") >= 0; }
-
-function render(p, i) {
-  const key = `${props.route.no}:${i}`;
-  const anns = store.annotations.filter((a) => a.chapter === Number(props.route.no) && a.para === i + 1);
-  const sig = JSON.stringify([store.settings.pinyin, store.settings.showEntities, anns.map((a) => a.id + a.color)]);
-  const cached = renderCache.get(key);
-  if (cached && cached.sig === sig) return cached.html;
-  const html = renderParagraph(p.o, {
-    matcher: matcher.value,
-    notes: notes.value,
-    annotations: anns,
-    pinyin: store.settings.pinyin,
-    showEntities: store.settings.showEntities,
-  });
-  renderCache.set(key, { sig, html });
-  return html;
-}
-
-function secChanged(i) {
-  if (i === 0) return true;
-  return paras.value[i].sec !== paras.value[i - 1].sec;
-}
-
-/* 交互 */
-function onReadingClick(e) {
-  const ent = e.target.closest("[data-ent]");
-  if (ent) {
-    store.panel = { type: ent.dataset.ent, id: ent.dataset.id };
-    store.assistant = true;
-    return;
-  }
-  const note = e.target.closest("[data-note]");
-  if (note) {
-    const n = Number(note.dataset.note);
-    const found = notes.value.find((x) => x.n === n);
-    if (found) {
-      const r = note.getBoundingClientRect();
-      notePop.value = { ...found, x: r.left + window.scrollX, y: r.top + window.scrollY + 26 };
-    }
-    return;
-  }
-  const ann = e.target.closest("[data-ann]");
-  if (ann) {
-    const found = store.annotations.find((a) => a.id === ann.dataset.ann);
-    if (found) store.dialogue = { kind: "annotation", data: found };
-  }
-}
-
-function onMouseUp(e) {
-  const box = e.currentTarget;
-  setTimeout(() => {
-    const s = window.getSelection();
-    if (!s || s.isCollapsed) return;
-    const txt = s.toString().trim();
-    if (txt.length < 2 || txt.length > 160) return;
-    const holder = s.anchorNode && s.anchorNode.parentElement ? s.anchorNode.parentElement.closest("[id^='p-']") : null;
-    if (!holder || !box.contains(holder)) return;
-    const rect = s.getRangeAt(0).getBoundingClientRect();
-    if (!rect.width) return;
-    sel.value = {
-      chapter: Number(props.route.no),
-      para: Number(holder.id.slice(2)),
-      text: txt,
-      x: rect.left + rect.width / 2,
-      y: rect.top + window.scrollY + 26,
-    };
-    notePop.value = null;
-  }, 10);
-}
-
-function saveAnnotation() {
-  if (!sel.value) return;
-  addAnnotation({ chapter: sel.value.chapter, para: sel.value.para, quote: sel.value.text, note: annotText.value, color: annotColor.value });
-  sel.value = null;
-  annotText.value = "";
-  window.getSelection()?.removeAllRanges();
-  store.toast = "批注已保存";
-  setTimeout(() => (store.toast = ""), 1800);
-}
-
-/* 进度 */
-let io = null;
-function setupObserver() {
-  if (io) io.disconnect();
-  io = new IntersectionObserver((entries) => {
-    for (const en of entries) {
-      if (en.isIntersecting) {
-        const n = Number(en.target.id.slice(2));
-        store.currentPara = n;
-        setProgress(props.route.no, n);
-      }
-    }
-  }, { rootMargin: "-30% 0px -60% 0px" });
-  t8(() => document.querySelectorAll("[id^='p-']").forEach((el) => io.observe(el)));
-}
-
-ny(() => store.chapter, () => {
-  renderCache.clear();
-  t8(setupObserver);
-}, { immediate: true });
-
-lS(() => {
-  setupObserver();
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onResize);
-});
-lw(() => {
-  if (io) io.disconnect();
-  window.removeEventListener("scroll", onScroll);
-  window.removeEventListener("resize", onResize);
-});
-function onScroll() {
-  if (sel.value) sel.value = null;
-  if (notePop.value) notePop.value = null;
-}
-
-const prevNo = iD(() => (props.route.no > 1 ? props.route.no - 1 : null));
-const nextNo = iD(() => (props.route.no < 130 ? props.route.no + 1 : null));
-const prevTitle = iD(() => store.index?.chapters.find((c) => c.no === prevNo.value)?.title);
-const nextTitle = iD(() => store.index?.chapters.find((c) => c.no === nextNo.value)?.title);
-
-const selStyle = iD(() => {
-  if (!sel.value) return {};
-  const left = Math.min(Math.max(sel.value.x - 150, 12), winW.value - 320);
-  return { left: left + "px", top: sel.value.y + "px" };
-});
-const noteStyle = iD(() => {
-  if (!notePop.value) return {};
-  const left = Math.min(Math.max(notePop.value.x - 150, 12), winW.value - 320);
-  return { left: left + "px", top: notePop.value.y + "px" };
-});
-
-function openPerson(id) { store.panel = { type: "person", id }; store.assistant = true; }
-function openSandbox(id) { go("/sandbox/" + id); }
-function copyLink(i) {
-  const url = `${location.origin}${location.pathname}#/c/${props.route.no}/${i + 1}`;
-  if (navigator.clipboard) navigator.clipboard.writeText(url);
-  store.toast = "段落链接已复制";
-  setTimeout(() => (store.toast = ""), 1600);
-}
-
-return (_ctx, _cache) => {
-  return (r4(), ie(rQ, null, [
-    ia("div", _hoisted_1$h, [
-      ia("button", {
-        class: Y(["icon-btn", { on: tA(store).tocOpen }]),
-        title: "目录",
-        onClick: _cache[0] || (_cache[0] = $event => (tA(store).tocOpen = !tA(store).tocOpen))
-      }, "☰", 2 /* CLASS */),
-      ia("div", _hoisted_2$h, [
-        _cache[25] || (_cache[25] = ia("span", null, "史记", -1 /* CACHED */)),
-        _cache[26] || (_cache[26] = ia("span", { class: "sep" }, "/", -1 /* CACHED */)),
-        ia("b", null, ea(chapter.value ? chapter.value.cat : ""), 1 /* TEXT */),
-        _cache[27] || (_cache[27] = ia("span", { class: "sep" }, "/", -1 /* CACHED */)),
-        ia("b", null, ea(chapter.value ? chapter.value.title : ""), 1 /* TEXT */),
-        _cache[28] || (_cache[28] = ia("span", { class: "sep" }, "·", -1 /* CACHED */)),
-        ia("span", _hoisted_3$h, "第 " + ea(tA(store).currentPara || 1) + " / " + ea(paras.value.length) + " 段", 1 /* TEXT */)
-      ]),
-      ia("div", _hoisted_4$h, [
-        ia("div", _hoisted_5$h, [
-          ia("button", {
-            class: Y({ on: tA(store).settings.layout === 'dual' }),
-            onClick: _cache[1] || (_cache[1] = $event => (tA(store).settings.layout = 'dual'))
-          }, "对照", 2 /* CLASS */),
-          ia("button", {
-            class: Y({ on: tA(store).settings.layout === 'orig' }),
-            onClick: _cache[2] || (_cache[2] = $event => (tA(store).settings.layout = 'orig'))
-          }, "原文", 2 /* CLASS */),
-          ia("button", {
-            class: Y({ on: tA(store).settings.layout === 'trans' }),
-            onClick: _cache[3] || (_cache[3] = $event => (tA(store).settings.layout = 'trans'))
-          }, "译文", 2 /* CLASS */)
-        ]),
-        ia("button", {
-          class: Y(["chip ghost", { on: tA(store).settings.pinyin }]),
-          onClick: _cache[4] || (_cache[4] = $event => (tA(store).settings.pinyin = !tA(store).settings.pinyin))
-        }, " 注音" + ea(tA(store).settings.pinyin ? " · 开" : ""), 3 /* TEXT, CLASS */),
-        ia("button", {
-          class: "chip ghost",
-          onClick: _cache[5] || (_cache[5] = $event => (companionsOpen.value = true))
-        }, "伴读" + ea(companions.value.length ? " " + companions.value.length : ""), 1 /* TEXT */),
-        ia("button", {
-          class: Y(["chip ghost", { on: annotOpen.value }]),
-          onClick: _cache[6] || (_cache[6] = $event => (annotOpen.value = !annotOpen.value))
-        }, "批注" + ea(myAnnots.value.length ? " " + myAnnots.value.length : ""), 3 /* TEXT, CLASS */),
-        ia("button", {
-          class: "icon-btn",
-          title: "阅读设置",
-          onClick: _cache[7] || (_cache[7] = $event => (tA(store).dialogue = { kind: 'settings' }))
-        }, "⚙")
-      ])
-    ]),
-    ia("div", {
-      class: "reading-wrap",
-      onMouseup: onMouseUp,
-      onClick: onReadingClick
-    }, [
-      ia("div", _hoisted_6$h, [
-        ia("div", _hoisted_7$h, [
-          ia("div", _hoisted_8$h, ea(chapter.value ? chapter.value.cat : "") + " · 卷" + ea(String(__props.route.no).padStart(3, "0")), 1 /* TEXT */),
-          ia("h1", null, ea(chapter.value ? chapter.value.title : ""), 1 /* TEXT */),
-          ia("div", _hoisted_9$h, [
-            id(ea(meta.value ? meta.value.chars.toLocaleString() : 0) + " 字 · " + ea(paras.value.length) + " 段 · 注 " + ea(notes.value.length) + " 条 ", 1 /* TEXT */),
-            (companions.value.length)
-              ? (r4(), ie("span", _hoisted_10$g, " · 伴读 " + ea(companions.value.length), 1 /* TEXT */))
-              : ig("v-if", true),
-            (poems.value.length)
-              ? (r4(), ie("span", _hoisted_11$g, " · 相关诗词 " + ea(poems.value.length), 1 /* TEXT */))
-              : ig("v-if", true)
-          ]),
-          _cache[29] || (_cache[29] = ia("div", { class: "rule" }, null, -1 /* CACHED */))
-        ]),
-        (chapter.value && chapter.value.intro)
-          ? (r4(), ie("div", _hoisted_12$g, [
-              ia("div", _hoisted_13$f, [
-                _cache[30] || (_cache[30] = ia("b", null, "本篇导读", -1 /* CACHED */)),
-                _cache[31] || (_cache[31] = ia("span", { style: {"margin-left":"auto","font-size":"11.5px","color":"var(--muted)"} }, "编者按", -1 /* CACHED */)),
-                ia("button", {
-                  class: "chip ghost",
-                  onClick: _cache[8] || (_cache[8] = $event => (showIntro.value = !showIntro.value))
-                }, ea(showIntro.value ? "收起" : "展开"), 1 /* TEXT */)
-              ]),
-              (showIntro.value)
-                ? (r4(), ie("div", _hoisted_14$e, [
-                    ia("div", _hoisted_15$c, ea(chapter.value.intro), 1 /* TEXT */),
-                    ia("div", _hoisted_16$b, [
-                      (companions.value.length)
-                        ? (r4(), ie("button", {
-                            key: 0,
-                            class: "chip",
-                            onClick: _cache[9] || (_cache[9] = $event => (companionsOpen.value = true))
-                          }, "伴读 · 历代评点 " + ea(companions.value.length), 1 /* TEXT */))
-                        : ig("v-if", true),
-                      (poems.value.length)
-                        ? (r4(), ie("button", {
-                            key: 1,
-                            class: "chip",
-                            onClick: _cache[10] || (_cache[10] = $event => (tA(store).dialogue = { kind: 'poems', data: poems.value }))
-                          }, "后人咏史 " + ea(poems.value.length) + " 首", 1 /* TEXT */))
-                        : ig("v-if", true),
-                      (r4(true), ie(rQ, null, lj(campaigns.value, (c) => {
-                        return (r4(), ie("button", {
-                          key: c.id,
-                          class: "chip red",
-                          onClick: $event => (openSandbox(c.id))
-                        }, "沙盘 · " + ea(c.name), 9 /* TEXT, PROPS */, _hoisted_17$b))
-                      }), 128 /* KEYED_FRAGMENT */)),
-                      (r4(true), ie(rQ, null, lj(hsMap.value, (m) => {
-                        return (r4(), ie("button", {
-                          key: m.hanshu.join(),
-                          class: "chip",
-                          onClick: $event => (tA(go)('/library/' + m.hanshu[0]))
-                        }, " 《汉书》" + ea(m.hanshu.map(hsTitle).join("、")), 9 /* TEXT, PROPS */, _hoisted_18$b))
-                      }), 128 /* KEYED_FRAGMENT */)),
-                      ia("button", {
-                        class: "chip ghost",
-                        onClick: _cache[11] || (_cache[11] = $event => (notesOpen.value = true))
-                      }, "注释 " + ea(notes.value.length) + " 条", 1 /* TEXT */)
-                    ])
-                  ]))
-                : ig("v-if", true)
-            ]))
-          : ig("v-if", true),
-        (r4(true), ie(rQ, null, lj(paras.value, (p, i) => {
-          return (r4(), ie("div", {
-            id: 'p-' + (i + 1),
-            key: i,
-            class: Y(["pblock", { taishigong: isTaishi(p.sec) }])
-          }, [
-            (secChanged(i) && p.sec)
-              ? (r4(), ie("div", _hoisted_20$9, ea(p.sec), 1 /* TEXT */))
-              : ig("v-if", true),
-            ia("div", _hoisted_21$9, [
-              ia("button", {
-                class: Y(["chip plain", { fav: tA(isFavorite)(Number(__props.route.no), i + 1) }]),
-                onClick: oa($event => (tA(toggleFavorite)(Number(__props.route.no), i + 1, p.o)), ["stop"])
-              }, ea(tA(isFavorite)(Number(__props.route.no), i + 1) ? "★ 已收藏" : "☆ 收藏"), 11 /* TEXT, CLASS, PROPS */, _hoisted_22$8),
-              (notesIn(p.o).length)
-                ? (r4(), ie("button", {
-                    key: 0,
-                    class: "chip",
-                    onClick: oa($event => (tA(store).dialogue = { kind: 'notes', data: notesIn(p.o) }), ["stop"])
-                  }, " 注 " + ea(notesIn(p.o).length), 9 /* TEXT, PROPS */, _hoisted_23$8))
-                : ig("v-if", true),
-              (hsLinks.value[i + 1])
-                ? (r4(), ie("button", {
-                    key: 1,
-                    class: "chip red",
-                    onClick: oa($event => (openHanshu(i + 1)), ["stop"])
-                  }, " 资料 " + ea(hsLinks.value[i + 1].length), 9 /* TEXT, PROPS */, _hoisted_24$7))
-                : ig("v-if", true),
-              (r4(true), ie(rQ, null, lj(personsIn(p.o).slice(0, 2), (e) => {
-                return (r4(), ie("button", {
-                  key: e.id,
-                  class: "chip",
-                  onClick: oa($event => (openPerson(e.id)), ["stop"])
-                }, ea(e.name), 9 /* TEXT, PROPS */, _hoisted_25$6))
-              }), 128 /* KEYED_FRAGMENT */)),
-              (poems.value.length)
-                ? (r4(), ie("button", {
-                    key: 2,
-                    class: "chip ghost",
-                    onClick: _cache[12] || (_cache[12] = oa($event => (tA(store).dialogue = { kind: 'poems', data: poems.value }), ["stop"]))
-                  }, "诗词"))
-                : ig("v-if", true),
-              ia("button", {
-                class: "chip plain",
-                onClick: oa($event => (copyLink(i)), ["stop"])
-              }, "复制本段", 8 /* PROPS */, _hoisted_26$6),
-              _cache[32] || (_cache[32] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-              ia("span", _hoisted_27$6, ea(i + 1), 1 /* TEXT */)
-            ]),
-            ia("div", _hoisted_28$5, [
-              ia("div", _hoisted_29$5, [
-                ia("div", {
-                  class: "text-orig pinyin",
-                  innerHTML: render(p, i)
-                }, null, 8 /* PROPS */, _hoisted_30$5)
-              ]),
-              ia("div", _hoisted_31$5, [
-                (p.t)
-                  ? (r4(), ie("div", _hoisted_32$5, ea(p.t), 1 /* TEXT */))
-                  : (r4(), ie("div", _hoisted_33$4, "（本篇此段暂无译文）"))
-              ])
-            ])
-          ], 10 /* CLASS, PROPS */, _hoisted_19$b))
-        }), 128 /* KEYED_FRAGMENT */)),
-        (!paras.value.length)
-          ? (r4(), ie("div", _hoisted_34$3, " 本篇为表谱之体，正文以表格呈现，暂未收录分段原文。 "))
-          : ig("v-if", true),
-        (chapter.value && chapter.value.extra && chapter.value.extra.length)
-          ? (r4(), ie("div", _hoisted_35$3, [
-              (r4(true), ie(rQ, null, lj(chapter.value.extra, (ex, i) => {
-                return (r4(), ie("div", {
-                  key: i,
-                  class: "panel",
-                  style: {"margin-bottom":"12px"}
-                }, [
-                  ia("div", _hoisted_36$3, [
-                    ia("b", null, ea(ex.title), 1 /* TEXT */)
-                  ]),
-                  ia("div", _hoisted_37$2, [
-                    ia("div", {
-                      class: "md",
-                      innerHTML: tA(renderMD)(ex.text.slice(0, 2400))
-                    }, null, 8 /* PROPS */, _hoisted_38$2)
-                  ])
-                ]))
-              }), 128 /* KEYED_FRAGMENT */))
-            ]))
-          : ig("v-if", true),
-        ia("div", _hoisted_39$2, [
-          ia("div", _hoisted_40$1, [
-            _cache[33] || (_cache[33] = ia("b", null, "本篇注释", -1 /* CACHED */)),
-            ia("span", _hoisted_41$1, ea(notes.value.length) + " 条", 1 /* TEXT */),
-            ia("button", {
-              class: "chip ghost",
-              onClick: _cache[13] || (_cache[13] = $event => (notesOpen.value = !notesOpen.value))
-            }, ea(notesOpen.value ? "收起" : "展开"), 1 /* TEXT */)
-          ]),
-          (notesOpen.value)
-            ? (r4(), ie("div", _hoisted_42$1, [
-                (r4(true), ie(rQ, null, lj(notes.value, (n) => {
-                  return (r4(), ie("div", {
-                    key: n.n,
-                    style: {"padding":"7px 0","border-bottom":"1px dashed var(--line-2)"}
-                  }, [
-                    ia("b", _hoisted_43$1, ea(n.n) + ". " + ea(n.term), 1 /* TEXT */),
-                    ia("span", _hoisted_44$1, " — " + ea(n.text), 1 /* TEXT */)
-                  ]))
-                }), 128 /* KEYED_FRAGMENT */))
-              ]))
-            : ig("v-if", true)
-        ]),
-        ia("div", _hoisted_45$1, [
-          (prevNo.value)
-            ? (r4(), ie("button", {
-                key: 0,
-                class: "btn",
-                onClick: _cache[14] || (_cache[14] = $event => (tA(openChapter)(prevNo.value)))
-              }, "← 上一篇 · " + ea(prevTitle.value), 1 /* TEXT */))
-            : ig("v-if", true),
-          _cache[34] || (_cache[34] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-          (nextNo.value)
-            ? (r4(), ie("button", {
-                key: 1,
-                class: "btn primary",
-                onClick: _cache[15] || (_cache[15] = $event => (tA(openChapter)(nextNo.value)))
-              }, "下一篇 · " + ea(nextTitle.value) + " →", 1 /* TEXT */))
-            : ig("v-if", true)
-        ])
-      ]),
-      (sel.value)
-        ? (r4(), ie("div", {
-            key: 0,
-            class: "annot-pop",
-            style: G(selStyle.value),
-            onClick: _cache[18] || (_cache[18] = oa(() => {}, ["stop"]))
-          }, [
-            ia("div", _hoisted_46$1, " 「" + ea(sel.value.text.slice(0, 42)) + ea(sel.value.text.length > 42 ? "…" : "") + "」 ", 1 /* TEXT */),
-            nu(ia("textarea", {
-              "onUpdate:modelValue": _cache[16] || (_cache[16] = $event => ((annotText).value = $event)),
-              placeholder: "写下批注（可不填，仅划线）"
-            }, null, 512 /* NEED_PATCH */), [
-              [s4, annotText.value]
-            ]),
-            ia("div", _hoisted_47$1, [
-              (r4(), ie(rQ, null, lj(['hl-y', 'hl-g', 'hl-b', 'hl-p'], (c) => {
-                return ia("span", {
-                  key: c,
-                  class: Y(["swatch", [c, { on: annotColor.value === c }]]),
-                  onClick: $event => (annotColor.value = c)
-                }, null, 10 /* CLASS, PROPS */, _hoisted_48$1)
-              }), 64 /* STABLE_FRAGMENT */)),
-              _cache[35] || (_cache[35] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
-              ia("button", {
-                class: "btn sm",
-                onClick: _cache[17] || (_cache[17] = $event => (sel.value = null))
-              }, "取消"),
-              ia("button", {
-                class: "btn sm primary",
-                onClick: saveAnnotation
-              }, "保存批注")
-            ])
-          ], 4 /* STYLE */))
-        : ig("v-if", true),
-      (notePop.value)
-        ? (r4(), ie("div", {
-            key: 1,
-            class: "annot-pop",
-            style: G(noteStyle.value),
-            onClick: _cache[19] || (_cache[19] = oa(() => {}, ["stop"]))
-          }, [
-            ia("div", _hoisted_49$1, "注 " + ea(notePop.value.n), 1 /* TEXT */),
-            ia("b", _hoisted_50$1, ea(notePop.value.term), 1 /* TEXT */),
-            ia("div", _hoisted_51$1, ea(notePop.value.text), 1 /* TEXT */)
-          ], 4 /* STYLE */))
-        : ig("v-if", true)
-    ], 32 /* NEED_HYDRATION */),
-    (companionsOpen.value)
-      ? (r4(), ie("div", {
-          key: 0,
-          class: "overlay",
-          onClick: _cache[21] || (_cache[21] = oa($event => (companionsOpen.value = false), ["self"]))
-        }, [
-          ia("div", _hoisted_52$1, [
-            ia("div", _hoisted_53, [
-              ia("b", null, "伴读 · " + ea(chapter.value ? chapter.value.title : ""), 1 /* TEXT */),
-              _cache[36] || (_cache[36] = ia("span", { style: {"font-size":"11.5px","color":"var(--muted)"} }, "订阅伴读者的公开批注", -1 /* CACHED */)),
-              ia("button", {
-                class: "icon-btn",
-                style: {"margin-left":"auto"},
-                onClick: _cache[20] || (_cache[20] = $event => (companionsOpen.value = false))
-              }, "✕")
-            ]),
-            ia("div", _hoisted_54, [
-              (r4(true), ie(rQ, null, lj(companions.value, (c) => {
-                return (r4(), ie("div", {
-                  key: c.id,
-                  style: {"padding":"12px 0","border-bottom":"1px dashed var(--line-2)"}
-                }, [
-                  ia("div", _hoisted_55, [
-                    ia("span", _hoisted_56, ea(c.author), 1 /* TEXT */),
-                    ia("span", _hoisted_57, ea(c.source), 1 /* TEXT */),
-                    ia("span", _hoisted_58, ea(c.kind), 1 /* TEXT */)
-                  ]),
-                  ia("div", _hoisted_59, ea(c.text), 1 /* TEXT */)
-                ]))
-              }), 128 /* KEYED_FRAGMENT */)),
-              (!companions.value.length)
-                ? (r4(), ie("div", _hoisted_60, "本篇暂无伴读评点。"))
-                : ig("v-if", true)
-            ])
-          ])
-        ]))
-      : ig("v-if", true),
-    (annotOpen.value)
-      ? (r4(), it(AnnotationPanel, {
-          key: 1,
-          chapter: Number(__props.route.no),
-          onClose: _cache[22] || (_cache[22] = $event => (annotOpen.value = false))
-        }, null, 8 /* PROPS */, ["chapter"]))
-      : ig("v-if", true),
-    (hsDrawer.value)
-      ? (r4(), ie("div", {
-          key: 2,
-          class: "overlay",
-          onClick: _cache[24] || (_cache[24] = oa($event => (hsDrawer.value = null), ["self"]))
-        }, [
-          ia("div", _hoisted_61, [
-            ia("div", _hoisted_62, [
-              _cache[37] || (_cache[37] = ia("b", null, "资料库 · 《汉书》对照", -1 /* CACHED */)),
-              ia("span", _hoisted_63, "《史记》第 " + ea(hsDrawer.value.para) + " 段 · 互见 " + ea(hsDrawer.value.items.length) + " 条", 1 /* TEXT */),
-              ia("button", {
-                class: "icon-btn",
-                style: {"margin-left":"auto"},
-                onClick: _cache[23] || (_cache[23] = $event => (hsDrawer.value = null))
-              }, "✕")
-            ]),
-            ia("div", _hoisted_64, [
-              (hsLoading.value)
-                ? (r4(), ie("div", _hoisted_65, "正在翻检《汉书》……"))
-                : ig("v-if", true),
-              (r4(true), ie(rQ, null, lj(hsDrawer.value.items, (it, i) => {
-                return (r4(), ie("div", {
-                  key: i,
-                  class: "hs-item"
-                }, [
-                  ia("div", _hoisted_66, [
-                    ia("a", {
-                      onClick: $event => (tA(go)('/library/' + it.id + '/' + (it.p + 1)))
-                    }, "《汉书·" + ea(it.title) + "》第 " + ea(it.p + 1) + " 段", 9 /* TEXT, PROPS */, _hoisted_67),
-                    _cache[38] || (_cache[38] = ia("span", { style: {"margin-left":"auto","font-size":"11px","color":"var(--muted)"} }, "原文", -1 /* CACHED */))
-                  ]),
-                  ia("div", _hoisted_68, ea(it.text), 1 /* TEXT */),
-                  (it.trans)
-                    ? (r4(), ie("div", _hoisted_69, ea(it.trans), 1 /* TEXT */))
-                    : ig("v-if", true)
-                ]))
-              }), 128 /* KEYED_FRAGMENT */)),
-              _cache[39] || (_cache[39] = ia("div", {
-                class: "desc",
-                style: {"margin-top":"10px","color":"var(--muted)","font-size":"11.5px"}
-              }, " 对照由人物、地名共现自动匹配，仅供互见参考；两书叙事详略与书法不同，正可互参。 ", -1 /* CACHED */))
-            ])
-          ])
-        ]))
-      : ig("v-if", true)
-  ], 64 /* STABLE_FRAGMENT */))
-}
-}
-
-};
-
-const _hoisted_1$g = { class: "page" };
-const _hoisted_2$g = { class: "filters" };
-const _hoisted_3$g = ["onClick"];
-const _hoisted_4$g = { class: "grid-cards" };
-const _hoisted_5$g = ["onClick"];
-const _hoisted_6$g = { class: "pill-row" };
-const _hoisted_7$g = { class: "meta" };
-const _hoisted_8$g = {
-  class: "modal",
-  style: {"width":"720px"}
-};
-const _hoisted_9$g = { class: "modal-head" };
-const _hoisted_10$f = { style: {"font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_11$f = { class: "modal-body" };
-const _hoisted_12$f = {
-  class: "desc",
-  style: {"font-family":"var(--serif)","font-size":"14.5px","line-height":"2"}
-};
-const _hoisted_13$e = { class: "rel-list" };
-const _hoisted_14$d = ["onClick"];
-const _hoisted_15$b = { class: "rel-list" };
-
-
-var EventsView = {
-  __name: 'EventsView',
-  props: { route: { type: Object, default: () => ({}) } },
-  setup(__props) {
-
-const props = __props;
-const kw = tx("");
-const period = tx("全部");
-
-const events = iD(() => store.events?.events || []);
-const periods = iD(() => ["全部", ...new Set(events.value.map((e) => e.period).filter(Boolean))]);
-const list = iD(() =>
-  events.value.filter((e) =>
-    (period.value === "全部" || e.period === period.value) &&
-    (!kw.value.trim() || e.name.includes(kw.value) || (e.summary || "").includes(kw.value) || (e.keyFigures || []).some((k) => k.includes(kw.value)))
-  )
-);
-const detail = iD(() => events.value.find((e) => e.id === props.route.id) || null);
-function open(e) { go("/events/" + e.id); }
-function close() { go("/events"); }
-function jump(no) { go(`/c/${no}`); }
-
-return (_ctx, _cache) => {
-  return (r4(), ie("div", _hoisted_1$g, [
-    _cache[4] || (_cache[4] = ia("div", { class: "page-head" }, [
-      ia("h2", null, "纪事本末"),
-      ia("p", null, "《史记》是纪传体，一事的始末散落在本纪、世家、列传之间。此处按「事」重新打包，可集中看完一件大事的来龙去脉。")
-    ], -1 /* CACHED */)),
-    ia("div", _hoisted_2$g, [
-      nu(ia("input", {
-        "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ((kw).value = $event)),
-        class: "search-input",
-        style: {"max-width":"260px"},
-        placeholder: "搜索事件、人物"
-      }, null, 512 /* NEED_PATCH */), [
-        [s4, kw.value]
-      ]),
-      (r4(true), ie(rQ, null, lj(periods.value, (p) => {
-        return (r4(), ie("button", {
-          key: p,
-          class: Y(["filter-pill", { on: period.value === p }]),
-          onClick: $event => (period.value = p)
-        }, ea(p), 11 /* TEXT, CLASS, PROPS */, _hoisted_3$g))
-      }), 128 /* KEYED_FRAGMENT */))
-    ]),
-    ia("div", _hoisted_4$g, [
-      (r4(true), ie(rQ, null, lj(list.value, (e) => {
-        return (r4(), ie("div", {
-          key: e.id,
-          class: "item-card",
-          onClick: $event => (open(e))
-        }, [
-          ia("h4", null, ea(e.name), 1 /* TEXT */),
-          ia("p", null, ea(e.summary), 1 /* TEXT */),
-          ia("div", _hoisted_6$g, [
-            (r4(true), ie(rQ, null, lj((e.keyFigures || []).slice(0, 4), (k) => {
-              return (r4(), ie("span", {
-                key: k,
-                class: "mini-pill"
-              }, ea(k), 1 /* TEXT */))
-            }), 128 /* KEYED_FRAGMENT */))
-          ]),
-          ia("div", _hoisted_7$g, [
-            ia("span", null, ea(e.period), 1 /* TEXT */),
-            ia("span", null, "涉及 " + ea((e.chapters || []).length) + " 篇", 1 /* TEXT */)
-          ])
-        ], 8 /* PROPS */, _hoisted_5$g))
-      }), 128 /* KEYED_FRAGMENT */))
-    ]),
-    (detail.value)
-      ? (r4(), ie("div", {
-          key: 0,
-          class: "overlay",
-          onClick: oa(close, ["self"])
-        }, [
-          ia("div", _hoisted_8$g, [
-            ia("div", _hoisted_9$g, [
-              ia("b", null, ea(detail.value.name), 1 /* TEXT */),
-              ia("span", _hoisted_10$f, ea(detail.value.period), 1 /* TEXT */),
-              ia("button", {
-                class: "icon-btn",
-                style: {"margin-left":"auto"},
-                onClick: close
-              }, "✕")
-            ]),
-            ia("div", _hoisted_11$f, [
-              ia("div", _hoisted_12$f, ea(detail.value.summary), 1 /* TEXT */),
-              _cache[1] || (_cache[1] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
-              _cache[2] || (_cache[2] = ia("div", { class: "rel-group-title" }, "涉及篇目", -1 /* CACHED */)),
-              ia("div", _hoisted_13$e, [
-                (r4(true), ie(rQ, null, lj(detail.value.chapters, (no) => {
-                  return (r4(), ie("span", {
-                    key: no,
-                    class: "rel-pill",
-                    onClick: $event => {close(); jump(no);}
-                  }, " 卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_14$d))
-                }), 128 /* KEYED_FRAGMENT */))
-              ]),
-              _cache[3] || (_cache[3] = ia("div", {
-                class: "rel-group-title",
-                style: {"margin-top":"12px"}
-              }, "关键人物", -1 /* CACHED */)),
-              ia("div", _hoisted_15$b, [
-                (r4(true), ie(rQ, null, lj(detail.value.keyFigures || [], (k) => {
-                  return (r4(), ie("span", {
-                    key: k,
-                    class: "rel-pill"
-                  }, ea(k), 1 /* TEXT */))
-                }), 128 /* KEYED_FRAGMENT */))
-              ])
-            ])
-          ])
-        ]))
-      : ig("v-if", true)
-  ]))
-}
-}
-
-};
-
-const _hoisted_1$f = { class: "page" };
-const _hoisted_2$f = { class: "page-head" };
-const _hoisted_3$f = { style: {"margin-top":"10px"} };
-const _hoisted_4$f = { class: "tagline" };
-const _hoisted_5$f = { class: "tagline" };
-const _hoisted_6$f = {
-  key: 0,
-  class: "tagline"
-};
-const _hoisted_7$f = {
-  key: 1,
-  class: "tagline"
-};
-const _hoisted_8$f = { style: {"display":"grid","grid-template-columns":"1fr 340px","gap":"18px","align-items":"start"} };
-const _hoisted_9$f = { class: "panel" };
-const _hoisted_10$e = { class: "panel-body" };
-const _hoisted_11$e = {
-  class: "desc",
-  style: {"font-family":"var(--serif)","font-size":"15px","line-height":"2"}
-};
-const _hoisted_12$e = {
-  class: "panel",
-  style: {"margin-top":"12px"}
-};
-const _hoisted_13$d = { class: "panel-head" };
-const _hoisted_14$c = { style: {"margin-left":"auto","font-size":"11.5px","color":"var(--muted)"} };
-const _hoisted_15$a = {
-  class: "panel-body",
-  style: {"max-height":"420px","overflow":"auto"}
-};
-const _hoisted_16$a = ["onClick"];
-const _hoisted_17$a = { class: "mh" };
-const _hoisted_18$a = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_19$a = { class: "panel" };
-const _hoisted_20$8 = { class: "panel-body" };
-const _hoisted_21$8 = { class: "rel-group-title" };
-const _hoisted_22$7 = { class: "rel-list" };
-const _hoisted_23$7 = ["onClick"];
-const _hoisted_24$6 = { class: "ty" };
-const _hoisted_25$5 = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-const _hoisted_26$5 = {
-  class: "panel",
-  style: {"margin-top":"12px"}
-};
-const _hoisted_27$5 = { class: "panel-body" };
-const _hoisted_28$4 = { class: "rel-list" };
-const _hoisted_29$4 = ["onClick"];
-const _hoisted_30$4 = { class: "filters" };
-const _hoisted_31$4 = ["onClick"];
-const _hoisted_32$4 = { class: "rel-group-title" };
-const _hoisted_33$3 = { class: "grid-cards" };
-const _hoisted_34$2 = ["onClick"];
-const _hoisted_35$2 = { class: "meta" };
-const _hoisted_36$2 = {
-  key: 0,
-  class: "desc",
-  style: {"color":"var(--muted)"}
-};
-
-
-var PeopleView = {
-  __name: 'PeopleView',
-  props: { route: { type: Object, default: () => ({}) } },
-  setup(__props) {
-
-const props = __props;
-const kw = tx("");
-const dynasty = tx("全部");
-const people = iD(() => store.people?.people || []);
-const dynasties = iD(() => ["全部", ...new Set(people.value.map((p) => p.dynasty).filter(Boolean))]);
-
-const person = iD(() => (props.route.id ? personById(props.route.id) : null));
-
-const list = iD(() =>
-  people.value.filter(
-    (p) =>
-      (dynasty.value === "全部" || p.dynasty === dynasty.value) &&
-      (!kw.value.trim() || p.name.includes(kw.value) || (p.aliases || []).some((a) => a.includes(kw.value)) || (p.identity || "").includes(kw.value))
-  )
-);
-
-const groups = iD(() => {
-  const m = new Map();
-  for (const p of list.value) {
-    if (!m.has(p.dynasty)) m.set(p.dynasty, []);
-    m.get(p.dynasty).push(p);
-  }
-  return [...m.entries()];
-});
-
-const relGroups = iD(() => {
-  if (!person.value) return [];
-  const g = {};
-  for (const r of person.value.relations || []) {
-    const t = personById(r.target);
-    if (!t) continue;
-    (g[r.type] = g[r.type] || []).push({ ...r, target: t });
-  }
-  return Object.entries(g);
-});
-
-const mentions = tx([]);
-ny(person, async () => {
-  mentions.value = [];
-  if (!person.value) return;
-  if (!window.__searchIndex) window.__searchIndex = await fetchJSON("search.json");
-  const names = [person.value.name, ...(person.value.aliases || [])];
-  const out = [];
-  for (const row of window.__searchIndex) {
-    const o = plainText(row.o);
-    if (names.some((n) => o.includes(n))) { out.push(row); if (out.length >= 30) break; }
-  }
-  mentions.value = out;
-}, { immediate: true });
-
-function jump(id) { go("/people/" + id); }
-function openCh(no, p) { openChapter(no, p); }
-
-return (_ctx, _cache) => {
-  return (r4(), ie("div", _hoisted_1$f, [
-    ig(" 人物详情 "),
-    (person.value)
-      ? (r4(), ie(rQ, { key: 0 }, [
-          ia("div", _hoisted_2$f, [
-            ia("button", {
-              class: "chip ghost",
-              onClick: _cache[0] || (_cache[0] = $event => (tA(go)('/people')))
-            }, "← 人物志"),
-            ia("h2", _hoisted_3$f, ea(person.value.name), 1 /* TEXT */),
-            ia("p", null, [
-              ia("span", _hoisted_4$f, ea(person.value.dynasty), 1 /* TEXT */),
-              ia("span", _hoisted_5$f, ea(person.value.identity), 1 /* TEXT */),
-              (person.value.years)
-                ? (r4(), ie("span", _hoisted_6$f, ea(person.value.years), 1 /* TEXT */))
-                : ig("v-if", true),
-              (person.value.aliases?.length)
-                ? (r4(), ie("span", _hoisted_7$f, "别名：" + ea(person.value.aliases.join("、")), 1 /* TEXT */))
-                : ig("v-if", true)
-            ])
-          ]),
-          ia("div", _hoisted_8$f, [
-            ia("div", null, [
-              ia("div", _hoisted_9$f, [
-                _cache[2] || (_cache[2] = ia("div", { class: "panel-head" }, [
-                  ia("b", null, "小传")
-                ], -1 /* CACHED */)),
-                ia("div", _hoisted_10$e, [
-                  ia("div", _hoisted_11$e, ea(person.value.desc), 1 /* TEXT */)
-                ])
-              ]),
-              ia("div", _hoisted_12$e, [
-                ia("div", _hoisted_13$d, [
-                  _cache[3] || (_cache[3] = ia("b", null, "出现段落聚合", -1 /* CACHED */)),
-                  ia("span", _hoisted_14$c, ea(mentions.value.length) + " 段", 1 /* TEXT */)
-                ]),
-                ia("div", _hoisted_15$a, [
-                  (r4(true), ie(rQ, null, lj(mentions.value, (m) => {
-                    return (r4(), ie("div", {
-                      key: m.c + '-' + m.p,
-                      class: "mention",
-                      onClick: $event => (openCh(m.c, m.p))
-                    }, [
-                      ia("div", _hoisted_17$a, "卷" + ea(m.c) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === m.c)?.title) + " · 第 " + ea(m.p) + " 段", 1 /* TEXT */),
-                      id(" " + ea(tA(plainText)(m.o).slice(0, 90)) + "… ", 1 /* TEXT */)
-                    ], 8 /* PROPS */, _hoisted_16$a))
-                  }), 128 /* KEYED_FRAGMENT */)),
-                  (!mentions.value.length)
-                    ? (r4(), ie("div", _hoisted_18$a, "未检索到出现段落。"))
-                    : ig("v-if", true)
-                ])
-              ])
-            ]),
-            ia("div", null, [
-              ia("div", _hoisted_19$a, [
-                _cache[4] || (_cache[4] = ia("div", { class: "panel-head" }, [
-                  ia("b", null, "人物关系")
-                ], -1 /* CACHED */)),
-                ia("div", _hoisted_20$8, [
-                  (r4(true), ie(rQ, null, lj(relGroups.value, ([type, arr]) => {
-                    return (r4(), ie("div", {
-                      key: type,
-                      class: "rel-group"
-                    }, [
-                      ia("div", _hoisted_21$8, ea(type), 1 /* TEXT */),
-                      ia("div", _hoisted_22$7, [
-                        (r4(true), ie(rQ, null, lj(arr, (r) => {
-                          return (r4(), ie("span", {
-                            key: r.target.id + type,
-                            class: "rel-pill",
-                            onClick: $event => (jump(r.target.id))
-                          }, [
-                            id(ea(r.target.name), 1 /* TEXT */),
-                            ia("span", _hoisted_24$6, ea(r.label), 1 /* TEXT */)
-                          ], 8 /* PROPS */, _hoisted_23$7))
-                        }), 128 /* KEYED_FRAGMENT */))
-                      ])
-                    ]))
-                  }), 128 /* KEYED_FRAGMENT */)),
-                  (!relGroups.value.length)
-                    ? (r4(), ie("div", _hoisted_25$5, "暂无关系数据。"))
-                    : ig("v-if", true)
-                ])
-              ]),
-              ia("div", _hoisted_26$5, [
-                _cache[5] || (_cache[5] = ia("div", { class: "panel-head" }, [
-                  ia("b", null, "相关篇目")
-                ], -1 /* CACHED */)),
-                ia("div", _hoisted_27$5, [
-                  ia("div", _hoisted_28$4, [
-                    (r4(true), ie(rQ, null, lj(person.value.chapters, (no) => {
-                      return (r4(), ie("span", {
-                        key: no,
-                        class: "rel-pill",
-                        onClick: $event => (openCh(no))
-                      }, " 卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_29$4))
-                    }), 128 /* KEYED_FRAGMENT */))
-                  ])
-                ])
-              ])
-            ])
-          ])
-        ], 64 /* STABLE_FRAGMENT */))
-      : (r4(), ie(rQ, { key: 1 }, [
-          ig(" 人物列表 "),
-          _cache[6] || (_cache[6] = ia("div", { class: "page-head" }, [
-            ia("h2", null, "人物志"),
-            ia("p", null, "《史记》首创纪传体，以人系事。这里把散见各篇的人物抽出，附小传、关系与出场段落——读编年史易忘人，读列传易忘时，人物志可补两者之阙。")
-          ], -1 /* CACHED */)),
-          ia("div", _hoisted_30$4, [
-            nu(ia("input", {
-              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ((kw).value = $event)),
-              class: "search-input",
-              style: {"max-width":"240px"},
-              placeholder: "搜索人名、别名、身份"
-            }, null, 512 /* NEED_PATCH */), [
-              [s4, kw.value]
-            ]),
-            (r4(true), ie(rQ, null, lj(dynasties.value, (d) => {
-              return (r4(), ie("button", {
-                key: d,
-                class: Y(["filter-pill", { on: dynasty.value === d }]),
-                onClick: $event => (dynasty.value = d)
-              }, ea(d), 11 /* TEXT, CLASS, PROPS */, _hoisted_31$4))
-            }), 128 /* KEYED_FRAGMENT */))
-          ]),
-          (r4(true), ie(rQ, null, lj(groups.value, ([d, arr]) => {
-            return (r4(), ie("div", {
-              key: d,
-              style: {"margin-bottom":"20px"}
-            }, [
-              ia("div", _hoisted_32$4, ea(d) + " · " + ea(arr.length) + " 人", 1 /* TEXT */),
-              ia("div", _hoisted_33$3, [
-                (r4(true), ie(rQ, null, lj(arr, (p) => {
-                  return (r4(), ie("div", {
-                    key: p.id,
-                    class: "item-card",
-                    onClick: $event => (jump(p.id))
-                  }, [
-                    ia("h4", null, ea(p.name), 1 /* TEXT */),
-                    ia("p", null, ea((p.desc || "").slice(0, 58)) + "…", 1 /* TEXT */),
-                    ia("div", _hoisted_35$2, [
-                      ia("span", null, ea(p.identity), 1 /* TEXT */),
-                      ia("span", null, ea((p.relations || []).length) + " 条关系", 1 /* TEXT */)
-                    ])
-                  ], 8 /* PROPS */, _hoisted_34$2))
-                }), 128 /* KEYED_FRAGMENT */))
-              ])
-            ]))
-          }), 128 /* KEYED_FRAGMENT */)),
-          (!list.value.length)
-            ? (r4(), ie("div", _hoisted_36$2, "没有找到匹配的人物。"))
-            : ig("v-if", true)
-        ], 64 /* STABLE_FRAGMENT */))
-  ]))
-}
-}
-
-};
-
 // 简易地理投影与示意底图数据（经度 73~135，纬度 18~46）
 const BBOX = { lon0: 73, lon1: 135, lat0: 17.5, lat1: 46.5 };
 const W = 1000;
@@ -3478,54 +1055,54 @@ const REGIONS = {
   },
 };
 
-const _hoisted_1$e = { class: "map-shell" };
-const _hoisted_2$e = ["viewBox"];
-const _hoisted_3$e = ["width", "height"];
-const _hoisted_4$e = ["width", "height"];
-const _hoisted_5$e = ["d"];
-const _hoisted_6$e = ["d"];
-const _hoisted_7$e = { key: 3 };
-const _hoisted_8$e = ["d", "fill", "stroke"];
-const _hoisted_9$e = ["x", "y", "fill"];
-const _hoisted_10$d = { key: 4 };
-const _hoisted_11$d = ["d"];
-const _hoisted_12$d = { key: 5 };
-const _hoisted_13$c = ["d", "stroke-width"];
-const _hoisted_14$b = { key: 6 };
-const _hoisted_15$9 = ["d", "stroke"];
-const _hoisted_16$9 = { key: 7 };
-const _hoisted_17$9 = ["onClick"];
-const _hoisted_18$9 = ["cx", "cy", "r", "fill"];
-const _hoisted_19$9 = ["d", "fill"];
-const _hoisted_20$7 = ["cx", "cy", "r", "fill"];
-const _hoisted_21$7 = ["cx", "cy"];
-const _hoisted_22$6 = ["x", "y", "fill", "transform-origin"];
-const _hoisted_23$6 = { key: 8 };
-const _hoisted_24$5 = ["x", "y", "font-weight"];
-const _hoisted_25$4 = {
+const _hoisted_1$l = { class: "map-shell" };
+const _hoisted_2$l = ["viewBox"];
+const _hoisted_3$l = ["width", "height"];
+const _hoisted_4$l = ["width", "height"];
+const _hoisted_5$l = ["d"];
+const _hoisted_6$l = ["d"];
+const _hoisted_7$l = { key: 3 };
+const _hoisted_8$l = ["d", "fill", "stroke"];
+const _hoisted_9$l = ["x", "y", "fill"];
+const _hoisted_10$k = { key: 4 };
+const _hoisted_11$k = ["d"];
+const _hoisted_12$k = { key: 5 };
+const _hoisted_13$j = ["d", "stroke-width"];
+const _hoisted_14$i = { key: 6 };
+const _hoisted_15$g = ["d", "stroke"];
+const _hoisted_16$g = { key: 7 };
+const _hoisted_17$f = ["onClick"];
+const _hoisted_18$d = ["cx", "cy", "r", "fill"];
+const _hoisted_19$d = ["d", "fill"];
+const _hoisted_20$b = ["cx", "cy", "r", "fill"];
+const _hoisted_21$b = ["cx", "cy"];
+const _hoisted_22$a = ["x", "y", "fill", "transform-origin"];
+const _hoisted_23$a = { key: 8 };
+const _hoisted_24$9 = ["x", "y", "font-weight"];
+const _hoisted_25$8 = {
   key: 0,
   class: "map-toolbar"
 };
-const _hoisted_26$4 = { class: "layer-item" };
-const _hoisted_27$4 = { class: "layer-item" };
-const _hoisted_28$3 = { class: "layer-item" };
-const _hoisted_29$3 = { class: "layer-item" };
-const _hoisted_30$3 = { class: "layer-item" };
-const _hoisted_31$3 = { class: "layer-item" };
-const _hoisted_32$3 = { class: "layer-item" };
-const _hoisted_33$2 = { class: "layer-item" };
-const _hoisted_34$1 = {
+const _hoisted_26$8 = { class: "layer-item" };
+const _hoisted_27$7 = { class: "layer-item" };
+const _hoisted_28$6 = { class: "layer-item" };
+const _hoisted_29$6 = { class: "layer-item" };
+const _hoisted_30$6 = { class: "layer-item" };
+const _hoisted_31$6 = { class: "layer-item" };
+const _hoisted_32$6 = { class: "layer-item" };
+const _hoisted_33$5 = { class: "layer-item" };
+const _hoisted_34$4 = {
   key: 1,
   class: "map-minimap"
 };
-const _hoisted_35$1 = ["viewBox"];
-const _hoisted_36$1 = ["d"];
-const _hoisted_37$1 = ["x", "y", "width", "height"];
-const _hoisted_38$1 = {
+const _hoisted_35$4 = ["viewBox"];
+const _hoisted_36$4 = ["d"];
+const _hoisted_37$3 = ["x", "y", "width", "height"];
+const _hoisted_38$3 = {
   key: 2,
   class: "map-caption"
 };
-const _hoisted_39$1 = {
+const _hoisted_39$3 = {
   key: 3,
   class: "map-legend"
 };
@@ -3711,7 +1288,7 @@ function reset() { view.value = { cx: base.value.cx, cy: base.value.cy, scale: 1
 lw(() => { drag = null; });
 
 return (_ctx, _cache) => {
-  return (r4(), ie("div", _hoisted_1$e, [
+  return (r4(), ie("div", _hoisted_1$l, [
     (r4(), ie("svg", {
       ref_key: "svgEl",
       ref: svgEl,
@@ -3732,7 +1309,7 @@ return (_ctx, _cache) => {
         width: tA(W) + 1000,
         height: tA(H) + 1000,
         fill: "#f2efe3"
-      }, null, 8 /* PROPS */, _hoisted_3$e),
+      }, null, 8 /* PROPS */, _hoisted_3$l),
       (layers.value.grid)
         ? (r4(), ie("rect", {
             key: 0,
@@ -3741,7 +1318,7 @@ return (_ctx, _cache) => {
             width: tA(W) + 1000,
             height: tA(H) + 1000,
             fill: "url(#grid)"
-          }, null, 8 /* PROPS */, _hoisted_4$e))
+          }, null, 8 /* PROPS */, _hoisted_4$l))
         : ig("v-if", true),
       (layers.value.land)
         ? (r4(), ie("path", {
@@ -3750,7 +1327,7 @@ return (_ctx, _cache) => {
             fill: "url(#landGrad)",
             stroke: "#cdc7b2",
             "stroke-width": "1.2"
-          }, null, 8 /* PROPS */, _hoisted_5$e))
+          }, null, 8 /* PROPS */, _hoisted_5$l))
         : ig("v-if", true),
       (layers.value.land)
         ? (r4(), ie("path", {
@@ -3761,11 +1338,11 @@ return (_ctx, _cache) => {
             "stroke-width": "6",
             opacity: "0.3",
             filter: "url(#soft)"
-          }, null, 8 /* PROPS */, _hoisted_6$e))
+          }, null, 8 /* PROPS */, _hoisted_6$l))
         : ig("v-if", true),
       ig(" 疆域 "),
       (layers.value.regions)
-        ? (r4(), ie("g", _hoisted_7$e, [
+        ? (r4(), ie("g", _hoisted_7$l, [
             (r4(true), ie(rQ, null, lj(regionPolys.value, (r) => {
               return (r4(), ie("path", {
                 key: r.name,
@@ -3776,7 +1353,7 @@ return (_ctx, _cache) => {
                 "stroke-width": "1.3",
                 "stroke-opacity": "0.5",
                 "stroke-dasharray": "7 4"
-              }, null, 8 /* PROPS */, _hoisted_8$e))
+              }, null, 8 /* PROPS */, _hoisted_8$l))
             }), 128 /* KEYED_FRAGMENT */)),
             (r4(true), ie(rQ, null, lj(regionPolys.value, (r) => {
               return (r4(), ie("text", {
@@ -3789,13 +1366,13 @@ return (_ctx, _cache) => {
                 fill: r.color,
                 opacity: "0.8",
                 style: {"paint-order":"stroke","stroke":"#f2efe3","stroke-width":"3px"}
-              }, ea(r.name), 9 /* TEXT, PROPS */, _hoisted_9$e))
+              }, ea(r.name), 9 /* TEXT, PROPS */, _hoisted_9$l))
             }), 128 /* KEYED_FRAGMENT */))
           ]))
         : ig("v-if", true),
       ig(" 山脉 "),
       (layers.value.mountains)
-        ? (r4(), ie("g", _hoisted_10$d, [
+        ? (r4(), ie("g", _hoisted_10$k, [
             (r4(true), ie(rQ, null, lj(mountainPaths.value, (m) => {
               return (r4(), ie("path", {
                 key: m.name,
@@ -3806,13 +1383,13 @@ return (_ctx, _cache) => {
                 "stroke-linecap": "round",
                 "stroke-dasharray": "1 7",
                 opacity: "0.75"
-              }, null, 8 /* PROPS */, _hoisted_11$d))
+              }, null, 8 /* PROPS */, _hoisted_11$k))
             }), 128 /* KEYED_FRAGMENT */))
           ]))
         : ig("v-if", true),
       ig(" 水系 "),
       (layers.value.rivers)
-        ? (r4(), ie("g", _hoisted_12$d, [
+        ? (r4(), ie("g", _hoisted_12$k, [
             (r4(true), ie(rQ, null, lj(riverPaths.value, (r) => {
               return (r4(), ie("path", {
                 key: r.name,
@@ -3822,13 +1399,13 @@ return (_ctx, _cache) => {
                 "stroke-width": r.w,
                 "stroke-linecap": "round",
                 opacity: "0.9"
-              }, null, 8 /* PROPS */, _hoisted_13$c))
+              }, null, 8 /* PROPS */, _hoisted_13$j))
             }), 128 /* KEYED_FRAGMENT */))
           ]))
         : ig("v-if", true),
       ig(" 路线 "),
       (layers.value.routes)
-        ? (r4(), ie("g", _hoisted_14$b, [
+        ? (r4(), ie("g", _hoisted_14$i, [
             (r4(true), ie(rQ, null, lj(routePaths.value, (r, i) => {
               return (r4(), ie("path", {
                 key: 'rt' + i,
@@ -3847,13 +1424,13 @@ return (_ctx, _cache) => {
                   dur: "1.5s",
                   repeatCount: "indefinite"
                 }, null, -1 /* CACHED */)
-              ]))], 8 /* PROPS */, _hoisted_15$9))
+              ]))], 8 /* PROPS */, _hoisted_15$g))
             }), 128 /* KEYED_FRAGMENT */))
           ]))
         : ig("v-if", true),
       ig(" 地名 "),
       (layers.value.places)
-        ? (r4(), ie("g", _hoisted_16$9, [
+        ? (r4(), ie("g", _hoisted_16$g, [
             (r4(true), ie(rQ, null, lj(placed.value, (p) => {
               return (r4(), ie("g", {
                 key: p.id,
@@ -3869,7 +1446,7 @@ return (_ctx, _cache) => {
                       fill: p.id === __props.focusId ? '#b3282d' : '#3c3a34',
                       stroke: "#fff",
                       "stroke-width": "1.2"
-                    }, null, 8 /* PROPS */, _hoisted_18$9))
+                    }, null, 8 /* PROPS */, _hoisted_18$d))
                   : (p.type === '关隘')
                     ? (r4(), ie("path", {
                         key: 1,
@@ -3877,7 +1454,7 @@ return (_ctx, _cache) => {
                         fill: p.id === __props.focusId ? '#b3282d' : '#5b564b',
                         stroke: "#fff",
                         "stroke-width": "0.8"
-                      }, null, 8 /* PROPS */, _hoisted_19$9))
+                      }, null, 8 /* PROPS */, _hoisted_19$d))
                     : (r4(), ie("circle", {
                         key: 2,
                         cx: p.xy[0],
@@ -3886,15 +1463,15 @@ return (_ctx, _cache) => {
                         fill: p.id === __props.focusId ? '#b3282d' : '#5b564b',
                         stroke: "#fff",
                         "stroke-width": "0.8"
-                      }, null, 8 /* PROPS */, _hoisted_20$7)),
+                      }, null, 8 /* PROPS */, _hoisted_20$b)),
                 ia("circle", {
                   cx: p.xy[0],
                   cy: p.xy[1],
                   r: "9",
                   fill: "transparent"
-                }, null, 8 /* PROPS */, _hoisted_21$7),
+                }, null, 8 /* PROPS */, _hoisted_21$b),
                 ia("title", null, ea(p.name) + "（" + ea(p.modern) + "）：" + ea(p.desc), 1 /* TEXT */)
-              ], 8 /* PROPS */, _hoisted_17$9))
+              ], 8 /* PROPS */, _hoisted_17$f))
             }), 128 /* KEYED_FRAGMENT */))
           ]))
         : ig("v-if", true),
@@ -3914,12 +1491,12 @@ return (_ctx, _cache) => {
             transform: "rotate(45)",
             "transform-origin": `${m.xy[0]} ${m.xy[1]}`,
             opacity: "0.95"
-          }, null, 8 /* PROPS */, _hoisted_22$6)
+          }, null, 8 /* PROPS */, _hoisted_22$a)
         ]))
       }), 128 /* KEYED_FRAGMENT */)),
       ig(" 标注 "),
       (layers.value.labels)
-        ? (r4(), ie("g", _hoisted_23$6, [
+        ? (r4(), ie("g", _hoisted_23$a, [
             (r4(true), ie(rQ, null, lj(labels.value, (l) => {
               return (r4(), ie("text", {
                 key: 'lb-' + l.name + l.lx,
@@ -3930,15 +1507,15 @@ return (_ctx, _cache) => {
                 fill: "#33302a",
                 "font-weight": l.pr > 900 ? 700 : 400,
                 style: {"paint-order":"stroke","stroke":"#f2efe3","stroke-width":"2.8px","stroke-linejoin":"round"}
-              }, ea(l.name), 9 /* TEXT, PROPS */, _hoisted_24$5))
+              }, ea(l.name), 9 /* TEXT, PROPS */, _hoisted_24$9))
             }), 128 /* KEYED_FRAGMENT */))
           ]))
         : ig("v-if", true)
-    ], 44 /* STYLE, PROPS, NEED_HYDRATION */, _hoisted_2$e)),
+    ], 44 /* STYLE, PROPS, NEED_HYDRATION */, _hoisted_2$l)),
     (!__props.compact)
-      ? (r4(), ie("div", _hoisted_25$4, [
+      ? (r4(), ie("div", _hoisted_25$8, [
           _cache[18] || (_cache[18] = ia("div", { class: "layer-title" }, "图层", -1 /* CACHED */)),
-          ia("label", _hoisted_26$4, [
+          ia("label", _hoisted_26$8, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ((layers.value.regions) = $event))
@@ -3947,7 +1524,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[10] || (_cache[10] = id(" 疆域", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_27$4, [
+          ia("label", _hoisted_27$7, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ((layers.value.rivers) = $event))
@@ -3956,7 +1533,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[11] || (_cache[11] = id(" 水系", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_28$3, [
+          ia("label", _hoisted_28$6, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => ((layers.value.mountains) = $event))
@@ -3965,7 +1542,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[12] || (_cache[12] = id(" 山脉", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_29$3, [
+          ia("label", _hoisted_29$6, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => ((layers.value.places) = $event))
@@ -3974,7 +1551,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[13] || (_cache[13] = id(" 历史地名", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_30$3, [
+          ia("label", _hoisted_30$6, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[4] || (_cache[4] = $event => ((layers.value.labels) = $event))
@@ -3983,7 +1560,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[14] || (_cache[14] = id(" 地名标注", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_31$3, [
+          ia("label", _hoisted_31$6, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[5] || (_cache[5] = $event => ((layers.value.modern) = $event))
@@ -3992,7 +1569,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[15] || (_cache[15] = id(" 现代地名", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_32$3, [
+          ia("label", _hoisted_32$6, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[6] || (_cache[6] = $event => ((layers.value.grid) = $event))
@@ -4001,7 +1578,7 @@ return (_ctx, _cache) => {
             ]),
             _cache[16] || (_cache[16] = id(" 计里画方", -1 /* CACHED */))
           ]),
-          ia("label", _hoisted_33$2, [
+          ia("label", _hoisted_33$5, [
             nu(ia("input", {
               type: "checkbox",
               "onUpdate:modelValue": _cache[7] || (_cache[7] = $event => ((layers.value.land) = $event))
@@ -4019,7 +1596,7 @@ return (_ctx, _cache) => {
     ]),
     ig(" 鹰眼 "),
     (view.value.scale > 1.15)
-      ? (r4(), ie("div", _hoisted_34$1, [
+      ? (r4(), ie("div", _hoisted_34$4, [
           (r4(), ie("svg", {
             viewBox: `0 0 ${tA(W)} ${tA(H)}`
           }, [
@@ -4028,7 +1605,7 @@ return (_ctx, _cache) => {
               fill: "#e8e6d3",
               stroke: "#cdc7b2",
               "stroke-width": "3"
-            }, null, 8 /* PROPS */, _hoisted_36$1),
+            }, null, 8 /* PROPS */, _hoisted_36$4),
             ia("rect", {
               x: view.value.cx - base.value.w / view.value.scale / 2,
               y: view.value.cy - base.value.h / view.value.scale / 2,
@@ -4037,18 +1614,2693 @@ return (_ctx, _cache) => {
               fill: "none",
               stroke: "#b3282d",
               "stroke-width": "6"
-            }, null, 8 /* PROPS */, _hoisted_37$1)
-          ], 8 /* PROPS */, _hoisted_35$1))
+            }, null, 8 /* PROPS */, _hoisted_37$3)
+          ], 8 /* PROPS */, _hoisted_35$4))
         ]))
       : ig("v-if", true),
     (__props.caption)
-      ? (r4(), ie("div", _hoisted_38$1, ea(__props.caption), 1 /* TEXT */))
+      ? (r4(), ie("div", _hoisted_38$3, ea(__props.caption), 1 /* TEXT */))
       : ig("v-if", true),
     (!__props.compact)
-      ? (r4(), ie("div", _hoisted_39$1, [...(_cache[19] || (_cache[19] = [
+      ? (r4(), ie("div", _hoisted_39$3, [...(_cache[19] || (_cache[19] = [
           ih("<span><i style=\"background:#3c3a34;\"></i>都城</span><span><i style=\"background:#5b564b;\"></i>城邑/关隘</span><span><i style=\"background:#8fb2c9;\"></i>水系</span><span><i style=\"background:#b3282d;\"></i>行军路线</span><span style=\"opacity:.7;\">示意古地图 · 坐标取今地</span>", 5)
         ]))]))
       : ig("v-if", true)
+  ]))
+}
+}
+
+};
+
+const _hoisted_1$k = { class: "assistant" };
+const _hoisted_2$k = { class: "as-head" };
+const _hoisted_3$k = {
+  class: "as-tabs",
+  style: {"margin-left":"10px"}
+};
+const _hoisted_4$k = { class: "as-body" };
+const _hoisted_5$k = { key: 0 };
+const _hoisted_6$k = { class: "app-grid" };
+const _hoisted_7$k = ["onClick"];
+const _hoisted_8$k = { class: "ico" };
+const _hoisted_9$k = { class: "nm" };
+const _hoisted_10$j = { class: "ds" };
+const _hoisted_11$j = { class: "app-grid" };
+const _hoisted_12$j = {
+  key: 1,
+  style: {"padding":"14px"}
+};
+const _hoisted_13$i = { key: 0 };
+const _hoisted_14$h = { class: "card-title" };
+const _hoisted_15$f = { style: {"margin":"6px 0 10px"} };
+const _hoisted_16$f = { class: "tagline" };
+const _hoisted_17$e = { class: "tagline" };
+const _hoisted_18$c = {
+  key: 0,
+  class: "tagline"
+};
+const _hoisted_19$c = {
+  key: 0,
+  class: "kv"
+};
+const _hoisted_20$a = {
+  class: "desc",
+  style: {"margin":"10px 0"}
+};
+const _hoisted_21$a = { class: "rel-group-title" };
+const _hoisted_22$9 = { class: "rel-list" };
+const _hoisted_23$9 = ["onClick"];
+const _hoisted_24$8 = { class: "ty" };
+const _hoisted_25$7 = { class: "rel-list" };
+const _hoisted_26$7 = ["onClick"];
+const _hoisted_27$6 = { class: "rel-group-title" };
+const _hoisted_28$5 = { style: {"font-weight":"400"} };
+const _hoisted_29$5 = { style: {"max-height":"320px","overflow":"auto","margin-top":"6px"} };
+const _hoisted_30$5 = ["onClick"];
+const _hoisted_31$5 = { class: "mh" };
+const _hoisted_32$5 = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_33$4 = { class: "card-title" };
+const _hoisted_34$3 = { style: {"margin":"6px 0 10px"} };
+const _hoisted_35$3 = { class: "tagline" };
+const _hoisted_36$3 = { class: "tagline" };
+const _hoisted_37$2 = { class: "desc" };
+const _hoisted_38$2 = {
+  class: "kv",
+  style: {"margin-top":"8px"}
+};
+const _hoisted_39$2 = {
+  key: 0,
+  style: {"margin-top":"12px"}
+};
+const _hoisted_40$2 = { class: "rel-group-title" };
+const _hoisted_41$2 = { style: {"display":"flex","gap":"6px","margin-top":"8px","flex-wrap":"wrap"} };
+const _hoisted_42$2 = ["onClick"];
+const _hoisted_43$2 = { style: {"display":"flex","gap":"6px","margin-top":"10px"} };
+const _hoisted_44$2 = { class: "rel-list" };
+const _hoisted_45$2 = ["onClick"];
+const _hoisted_46$2 = { class: "rel-group-title" };
+const _hoisted_47$2 = { style: {"max-height":"260px","overflow":"auto"} };
+const _hoisted_48$2 = ["onClick"];
+const _hoisted_49$2 = { class: "mh" };
+const _hoisted_50$2 = { class: "card-title" };
+const _hoisted_51$2 = { style: {"margin":"6px 0 10px"} };
+const _hoisted_52$2 = { class: "tagline" };
+const _hoisted_53$1 = { class: "desc" };
+const _hoisted_54$1 = { class: "rel-list" };
+const _hoisted_55$1 = ["onClick"];
+const _hoisted_56$1 = {
+  key: 3,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_57$1 = {
+  key: 2,
+  class: "chat",
+  style: {"height":"100%"}
+};
+const _hoisted_58$1 = { style: {"display":"flex","align-items":"center","gap":"8px","padding":"7px 12px","border-bottom":"1px solid var(--line-2)","font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_59$1 = { class: "who" };
+const _hoisted_60$1 = { class: "bubble" };
+const _hoisted_61$1 = { style: {"white-space":"pre-line"} };
+const _hoisted_62$1 = ["onClick"];
+const _hoisted_63$1 = {
+  key: 0,
+  class: "msg"
+};
+const _hoisted_64$1 = { class: "chat-input" };
+const _hoisted_65$1 = ["onKeydown"];
+
+
+var Assistant = {
+  __name: 'Assistant',
+  setup(__props) {
+
+const tab = tx(store.assistantTab || "apps");
+ny(() => store.panel, (p) => { if (p) tab.value = "panel"; });
+ny(tab, (t) => (store.assistantTab = t));
+
+const panel = iD(() => store.panel);
+const person = iD(() => (panel.value?.type === "person" ? personById(panel.value.id) : null));
+const place = iD(() => (panel.value?.type === "place" ? placeById(panel.value.id) : null));
+const term = iD(() => (panel.value?.type === "term" ? termById(panel.value.id) : null));
+
+const relGroups = iD(() => {
+  if (!person.value) return [];
+  const groups = {};
+  for (const r of person.value.relations || []) {
+    const target = personById(r.target);
+    if (!target) continue;
+    (groups[r.type] = groups[r.type] || []).push({ ...r, target });
+  }
+  return Object.entries(groups).map(([type, list]) => ({ type, list }));
+});
+
+function openRel(id) { store.panel = { type: "person", id }; }
+
+/* 地名 → 相关战役沙盘 */
+const allCampaigns = iD(() => store.campaigns?.campaigns || []);
+const relatedCampaigns = iD(() => {
+  const p = place.value;
+  if (!p) return [];
+  const names = new Set([p.name, ...(p.aliases || [])]);
+  return allCampaigns.value.filter((c) => {
+    if ((c.summary || "").includes(p.name)) return true;
+    for (const s of c.steps || []) {
+      for (const m of s.markers || []) if (names.has(m.name)) return true;
+    }
+    return false;
+  });
+});
+
+const miniCampaign = iD(() => relatedCampaigns.value[0] || null);
+const miniPlaces = iD(() => {
+  const c = miniCampaign.value;
+  if (!c) return place.value ? [place.value] : [];
+  const names = new Set();
+  for (const s of c.steps || []) for (const m of s.markers || []) names.add(m.name);
+  const list = (store.places?.places || []).filter((p) => names.has(p.name));
+  if (place.value && !list.some((p) => p.id === place.value.id)) list.push(place.value);
+  return list;
+});
+const miniRoutes = iD(() => {
+  const c = miniCampaign.value;
+  if (!c) return [];
+  const out = [];
+  for (const s of c.steps || []) {
+    for (const r of s.routes || []) {
+      out.push({ ...r, color: (c.sides?.[r.side]?.color) || "#b3282d" });
+    }
+  }
+  return out;
+});
+const miniFit = iD(() => {
+  const pts = [];
+  for (const r of miniRoutes.value) for (const p of r.points || []) pts.push(p);
+  if (place.value) pts.push([place.value.lon, place.value.lat]);
+  return pts;
+});
+
+/* 出场段落聚合（按需检索） */
+const mentions = tx([]);
+const mentionLoading = tx(false);
+ny([person, place, term], async () => {
+  mentions.value = [];
+  const target = person.value || place.value || term.value;
+  if (!target) return;
+  mentionLoading.value = true;
+  try {
+    if (!window.__searchIndex) window.__searchIndex = await fetchJSON("search.json");
+    const names = [target.name, ...(target.aliases || [])].filter(Boolean);
+    const out = [];
+    for (const row of window.__searchIndex) {
+      const o = plainText(row.o);
+      if (names.some((n) => o.includes(n))) {
+        out.push(row);
+        if (out.length >= 24) break;
+      }
+    }
+    mentions.value = out;
+  } catch (e) { mentions.value = []; }
+  mentionLoading.value = false;
+}, { immediate: true });
+
+const apps = [
+  { key: "people", ico: "人", nm: "人物志", ds: "数风流人物", go: "/people" },
+  { key: "map", ico: "圖", nm: "历史地图", ds: "左图右史", go: "/map" },
+  { key: "sandbox", ico: "沙", nm: "沙盘态势", ds: "历史空间观察与推演", go: "/sandbox" },
+  { key: "tables", ico: "表", nm: "十表年表", ds: "以表系年，观大势", go: "/tables" },
+  { key: "library", ico: "籍", nm: "资料库·汉书", ds: "与《史记》对读", go: "/library" },
+  { key: "events", ico: "事", nm: "纪事本末", ds: "按事件读史", go: "/events" },
+  { key: "poems", ico: "詩", nm: "咏史诗", ds: "后人如何看这段史", go: "/poems" },
+  { key: "decisions", ico: "决", nm: "决策演武场", ds: "参与历史关键抉择", go: "/decisions" },
+  { key: "climate", ico: "氣", nm: "历史气候", ds: "五千年气温曲线", go: "/climate" },
+  { key: "offices", ico: "官", nm: "历代官职", ds: "读懂权力结构", go: "/offices" },
+  { key: "lexicon", ico: "典", nm: "通鉴百科", ds: "制度与典故", go: "/lexicon" },
+  { key: "me", ico: "我", nm: "个人空间", ds: "批注与足迹", go: "/me" },
+];
+function nav(p) { go(p); }
+
+/* AI 问答（本地检索式） */
+const msgs = tx([
+  { who: "ai", text: "我是史记助手。可以直接问我：《史记》里鸿门宴是怎么回事？项羽为什么不肯过江东？韩信是怎样被杀的？" },
+]);
+const input = tx("");
+const busy = tx(false);
+const logEl = tx(null);
+
+async function ask() {
+  const q = input.value.trim();
+  if (!q || busy.value) return;
+  msgs.value.push({ who: "me", text: q });
+  input.value = "";
+  busy.value = true;
+  await t8();
+  logEl.value?.scrollTo({ top: 1e9 });
+
+  if (store.ai?.key) {
+    await askModel(q);
+  } else {
+    await askLocal(q);
+  }
+  busy.value = false;
+  await t8();
+  logEl.value?.scrollTo({ top: 1e9 });
+}
+
+/* 检索增强：取最相关的《史记》段落作为上下文 */
+async function retrieve(q, limit = 5) {
+  if (!window.__searchIndex) window.__searchIndex = await fetchJSON("search.json");
+  const grams = [...new Set(q.replace(/[，。？！、；：""''（）\s]/g, "").split("").filter((c) => /[\u4e00-\u9fa5]/.test(c)))];
+  const scored = [];
+  for (const row of window.__searchIndex) {
+    const o = plainText(row.o);
+    let sc = 0;
+    for (const g of grams) if (o.includes(g)) sc += 1;
+    if (q.length >= 2 && o.includes(q)) sc += 12;
+    if (sc >= Math.min(4, grams.length)) scored.push({ row, sc });
+  }
+  scored.sort((a, b) => b.sc - a.sc);
+  return scored.slice(0, limit).map((x) => x.row);
+}
+
+async function askLocal(q) {
+  try {
+    const top = await retrieve(q, 3);
+    const meta = (no) => store.index?.chapters.find((c) => c.no === no);
+    if (!top.length) {
+      msgs.value.push({ who: "ai", text: "没有在《史记》全文中找到足够相关的段落。可以换一组关键词；也可以在「阅读设置 → 史记助手」里填入大模型 API Key，让我真正作答。" });
+      return;
+    }
+    let text = `在《史记》中检索到相关记载，最相关的是：\n`;
+    top.forEach((row, i) => {
+      text += `\n${i + 1}. 卷${row.c}《${meta(row.c)?.title}》（${row.sec}）\n「${plainText(row.o).slice(0, 90)}…」`;
+    });
+    text += "\n\n（当前为本地检索模式；填入 API Key 后可直接对史料作答。）";
+    msgs.value.push({ who: "ai", text, srcs: top.map((row) => ({ no: row.c, p: row.p, label: `卷${row.c}《${meta(row.c)?.title}》第 ${row.p} 段` })) });
+  } catch (e) {
+    msgs.value.push({ who: "ai", text: "检索出错了：" + e.message });
+  }
+}
+
+async function askModel(q) {
+  const meta = (no) => store.index?.chapters.find((c) => c.no === no);
+  let ctx = "";
+  let srcs = [];
+  try {
+    const rows = await retrieve(q, 5);
+    srcs = rows.map((row) => ({ no: row.c, p: row.p, label: `卷${row.c}《${meta(row.c)?.title}》第 ${row.p} 段` }));
+    ctx = rows.map((row, i) => `【材料${i + 1}】《史记·${meta(row.c)?.title}》${row.sec}：${plainText(row.o).slice(0, 500)}`).join("\n");
+  } catch {}
+
+  const msg = { who: "ai", text: "", srcs };
+  msgs.value.push(msg);
+  const idx = msgs.value.length - 1;
+  const sys = "你是「读史记」网站的助手，熟读《史记》。回答用简洁的现代汉语，先给结论，再引原文为证；引用史料时标明篇名。不要编造原文，若材料不足就直说。";
+  const user = ctx ? `【检索到的《史记》材料】\n${ctx}\n\n【问题】${q}` : q;
+
+  try {
+    const res = await fetch(store.ai.endpoint, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${store.ai.key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: store.ai.model,
+        stream: true,
+        temperature: 0.3,
+        messages: [{ role: "system", content: sys }, { role: "user", content: user }],
+      }),
+    });
+    if (!res.ok || !res.body) throw new Error("HTTP " + res.status + " " + (await res.text().catch(() => "")).slice(0, 120));
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop() || "";
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t.startsWith("data:")) continue;
+        const payload = t.slice(5).trim();
+        if (!payload || payload === "[DONE]") continue;
+        try {
+          const j = JSON.parse(payload);
+          const delta = j.choices?.[0]?.delta?.content || "";
+          if (delta) {
+            msgs.value[idx].text += delta;
+            await t8();
+            logEl.value?.scrollTo({ top: 1e9 });
+          }
+        } catch {}
+      }
+    }
+    if (!msgs.value[idx].text) msgs.value[idx].text = "（模型没有返回内容）";
+  } catch (e) {
+    msgs.value[idx].text = "调用模型失败：" + e.message + "\n可检查「阅读设置 → 史记助手」里的接口地址、模型名与 Key。";
+  }
+}
+
+function goto(no, p) { openChapter(no, p); }
+
+return (_ctx, _cache) => {
+  return (r4(), ie("aside", _hoisted_1$k, [
+    ia("div", _hoisted_2$k, [
+      _cache[12] || (_cache[12] = ia("b", { style: {"font-family":"var(--serif)","font-size":"15px"} }, "史记助手", -1 /* CACHED */)),
+      ia("div", _hoisted_3$k, [
+        ia("button", {
+          class: Y(["as-tab", { on: tab.value === 'apps' }]),
+          onClick: _cache[0] || (_cache[0] = $event => {tab.value = 'apps'; tA(store).panel = null;})
+        }, "应用", 2 /* CLASS */),
+        ia("button", {
+          class: Y(["as-tab", { on: tab.value === 'chat' }]),
+          onClick: _cache[1] || (_cache[1] = $event => (tab.value = 'chat'))
+        }, "问助手", 2 /* CLASS */),
+        (tA(store).panel)
+          ? (r4(), ie("button", {
+              key: 0,
+              class: Y(["as-tab", { on: tab.value === 'panel' }]),
+              onClick: _cache[2] || (_cache[2] = $event => (tab.value = 'panel'))
+            }, "详情", 2 /* CLASS */))
+          : ig("v-if", true)
+      ]),
+      ia("button", {
+        class: "icon-btn",
+        style: {"margin-left":"auto"},
+        title: "关闭",
+        onClick: _cache[3] || (_cache[3] = $event => (tA(store).assistant = false))
+      }, "✕")
+    ]),
+    ia("div", _hoisted_4$k, [
+      ig(" 应用宫格 "),
+      (tab.value === 'apps' && !tA(store).panel)
+        ? (r4(), ie("div", _hoisted_5$k, [
+            _cache[17] || (_cache[17] = ia("div", { class: "section-label" }, "应 用", -1 /* CACHED */)),
+            ia("div", _hoisted_6$k, [
+              (r4(), ie(rQ, null, lj(apps, (a) => {
+                return ia("div", {
+                  key: a.key,
+                  class: "app-item",
+                  onClick: $event => (nav(a.go))
+                }, [
+                  ia("div", _hoisted_8$k, ea(a.ico), 1 /* TEXT */),
+                  ia("div", null, [
+                    ia("div", _hoisted_9$k, ea(a.nm), 1 /* TEXT */),
+                    ia("div", _hoisted_10$j, ea(a.ds), 1 /* TEXT */)
+                  ])
+                ], 8 /* PROPS */, _hoisted_7$k)
+              }), 64 /* STABLE_FRAGMENT */))
+            ]),
+            _cache[18] || (_cache[18] = ia("div", { class: "section-label" }, "共 建", -1 /* CACHED */)),
+            ia("div", _hoisted_11$j, [
+              ia("div", {
+                class: "app-item",
+                onClick: _cache[4] || (_cache[4] = $event => (nav('/changelog')))
+              }, [...(_cache[13] || (_cache[13] = [
+                ia("div", { class: "ico" }, "更", -1 /* CACHED */),
+                ia("div", null, [
+                  ia("div", { class: "nm" }, "更新日志"),
+                  ia("div", { class: "ds" }, "v1.1 新增内容")
+                ], -1 /* CACHED */)
+              ]))]),
+              ia("div", {
+                class: "app-item",
+                onClick: _cache[5] || (_cache[5] = $event => (nav('/about')))
+              }, [...(_cache[14] || (_cache[14] = [
+                ia("div", { class: "ico" }, "计", -1 /* CACHED */),
+                ia("div", null, [
+                  ia("div", { class: "nm" }, "开发计划"),
+                  ia("div", { class: "ds" }, "待开发与已采纳")
+                ], -1 /* CACHED */)
+              ]))]),
+              ia("div", {
+                class: "app-item",
+                onClick: _cache[6] || (_cache[6] = $event => (nav('/about')))
+              }, [...(_cache[15] || (_cache[15] = [
+                ia("div", { class: "ico" }, "则", -1 /* CACHED */),
+                ia("div", null, [
+                  ia("div", { class: "nm" }, "读史记准则"),
+                  ia("div", { class: "ds" }, "编辑凡例")
+                ], -1 /* CACHED */)
+              ]))]),
+              ia("div", {
+                class: "app-item",
+                onClick: _cache[7] || (_cache[7] = $event => (nav('/about')))
+              }, [...(_cache[16] || (_cache[16] = [
+                ia("div", { class: "ico" }, "问", -1 /* CACHED */),
+                ia("div", null, [
+                  ia("div", { class: "nm" }, "常见问题"),
+                  ia("div", { class: "ds" }, "使用与版权")
+                ], -1 /* CACHED */)
+              ]))])
+            ]),
+            _cache[19] || (_cache[19] = ia("div", { style: {"padding":"6px 14px 18px","color":"var(--muted)","font-size":"11px","line-height":"1.7"} }, " 正文以中华书局点校本为参校，白话译文为编者们自撰。本站为研究性演示项目。 ", -1 /* CACHED */))
+          ]))
+        : ig("v-if", true),
+      ig(" 实体详情 "),
+      (tA(store).panel && tab.value !== 'chat')
+        ? (r4(), ie("div", _hoisted_12$j, [
+            ia("button", {
+              class: "chip ghost",
+              style: {"margin-bottom":"10px"},
+              onClick: _cache[8] || (_cache[8] = $event => {tA(store).panel = null; tab.value = 'apps';})
+            }, "← 返回应用"),
+            ig(" 人物 "),
+            (person.value)
+              ? (r4(), ie("div", _hoisted_13$i, [
+                  ia("div", _hoisted_14$h, ea(person.value.name), 1 /* TEXT */),
+                  ia("div", _hoisted_15$f, [
+                    ia("span", _hoisted_16$f, ea(person.value.dynasty), 1 /* TEXT */),
+                    ia("span", _hoisted_17$e, ea(person.value.identity), 1 /* TEXT */),
+                    (person.value.years)
+                      ? (r4(), ie("span", _hoisted_18$c, ea(person.value.years), 1 /* TEXT */))
+                      : ig("v-if", true)
+                  ]),
+                  (person.value.aliases?.length)
+                    ? (r4(), ie("div", _hoisted_19$c, [
+                        _cache[20] || (_cache[20] = ia("b", null, "别名", -1 /* CACHED */)),
+                        ia("span", null, ea(person.value.aliases.join("、")), 1 /* TEXT */)
+                      ]))
+                    : ig("v-if", true),
+                  ia("div", _hoisted_20$a, ea(person.value.desc), 1 /* TEXT */),
+                  _cache[22] || (_cache[22] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+                  (r4(true), ie(rQ, null, lj(relGroups.value, (g) => {
+                    return (r4(), ie("div", {
+                      class: "rel-group",
+                      key: g.type
+                    }, [
+                      ia("div", _hoisted_21$a, ea(g.type), 1 /* TEXT */),
+                      ia("div", _hoisted_22$9, [
+                        (r4(true), ie(rQ, null, lj(g.list, (r) => {
+                          return (r4(), ie("span", {
+                            key: r.target.id + r.type,
+                            class: "rel-pill",
+                            onClick: $event => (openRel(r.target.id))
+                          }, [
+                            id(ea(r.target.name), 1 /* TEXT */),
+                            ia("span", _hoisted_24$8, ea(r.label), 1 /* TEXT */)
+                          ], 8 /* PROPS */, _hoisted_23$9))
+                        }), 128 /* KEYED_FRAGMENT */))
+                      ])
+                    ]))
+                  }), 128 /* KEYED_FRAGMENT */)),
+                  _cache[23] || (_cache[23] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+                  _cache[24] || (_cache[24] = ia("div", { class: "rel-group-title" }, "相关篇目", -1 /* CACHED */)),
+                  ia("div", _hoisted_25$7, [
+                    (r4(true), ie(rQ, null, lj(person.value.chapters, (no) => {
+                      return (r4(), ie("span", {
+                        key: no,
+                        class: "rel-pill",
+                        onClick: $event => (goto(no))
+                      }, " 卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_26$7))
+                    }), 128 /* KEYED_FRAGMENT */))
+                  ]),
+                  _cache[25] || (_cache[25] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+                  ia("div", _hoisted_27$6, [
+                    _cache[21] || (_cache[21] = id(" 出现段落聚合 ", -1 /* CACHED */)),
+                    ia("span", _hoisted_28$5, "（" + ea(mentionLoading.value ? "检索中…" : mentions.value.length + " 段") + "）", 1 /* TEXT */)
+                  ]),
+                  ia("div", _hoisted_29$5, [
+                    (r4(true), ie(rQ, null, lj(mentions.value, (m) => {
+                      return (r4(), ie("div", {
+                        key: m.c + '-' + m.p,
+                        class: "mention",
+                        onClick: $event => (goto(m.c, m.p))
+                      }, [
+                        ia("div", _hoisted_31$5, "卷" + ea(m.c) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === m.c)?.title) + " · 第 " + ea(m.p) + " 段", 1 /* TEXT */),
+                        id(" " + ea(tA(plainText)(m.o).slice(0, 68)) + "… ", 1 /* TEXT */)
+                      ], 8 /* PROPS */, _hoisted_30$5))
+                    }), 128 /* KEYED_FRAGMENT */)),
+                    (!mentionLoading.value && !mentions.value.length)
+                      ? (r4(), ie("div", _hoisted_32$5, "未检索到出现段落"))
+                      : ig("v-if", true)
+                  ])
+                ]))
+              : (place.value)
+                ? (r4(), ie(rQ, { key: 1 }, [
+                    ig(" 地名 "),
+                    ia("div", null, [
+                      ia("div", _hoisted_33$4, ea(place.value.name), 1 /* TEXT */),
+                      ia("div", _hoisted_34$3, [
+                        ia("span", _hoisted_35$3, ea(place.value.type), 1 /* TEXT */),
+                        ia("span", _hoisted_36$3, "今 " + ea(place.value.modern), 1 /* TEXT */)
+                      ]),
+                      ia("div", _hoisted_37$2, ea(place.value.desc), 1 /* TEXT */),
+                      ia("div", _hoisted_38$2, [
+                        _cache[26] || (_cache[26] = ia("b", null, "坐标", -1 /* CACHED */)),
+                        ia("span", null, ea(place.value.lon) + ", " + ea(place.value.lat), 1 /* TEXT */)
+                      ]),
+                      (miniCampaign.value)
+                        ? (r4(), ie("div", _hoisted_39$2, [
+                            ia("div", _hoisted_40$2, "沙盘态势 · " + ea(miniCampaign.value.name), 1 /* TEXT */),
+                            iu(MapCanvas, {
+                              places: miniPlaces.value,
+                              routes: miniRoutes.value,
+                              fit: miniFit.value,
+                              height: 200,
+                              compact: ""
+                            }, null, 8 /* PROPS */, ["places", "routes", "fit"]),
+                            ia("div", _hoisted_41$2, [
+                              (r4(true), ie(rQ, null, lj(relatedCampaigns.value, (c) => {
+                                return (r4(), ie("button", {
+                                  key: c.id,
+                                  class: "btn sm primary",
+                                  onClick: $event => (nav('/sandbox/' + c.id))
+                                }, ea(c.name) + " · 推演 → ", 9 /* TEXT, PROPS */, _hoisted_42$2))
+                              }), 128 /* KEYED_FRAGMENT */))
+                            ])
+                          ]))
+                        : ig("v-if", true),
+                      ia("div", _hoisted_43$2, [
+                        ia("button", {
+                          class: "btn sm",
+                          onClick: _cache[9] || (_cache[9] = $event => (nav('/map')))
+                        }, "在地图中查看 →")
+                      ]),
+                      _cache[27] || (_cache[27] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+                      _cache[28] || (_cache[28] = ia("div", { class: "rel-group-title" }, "相关篇目", -1 /* CACHED */)),
+                      ia("div", _hoisted_44$2, [
+                        (r4(true), ie(rQ, null, lj(place.value.chapters, (no) => {
+                          return (r4(), ie("span", {
+                            key: no,
+                            class: "rel-pill",
+                            onClick: $event => (goto(no))
+                          }, "卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_45$2))
+                        }), 128 /* KEYED_FRAGMENT */))
+                      ]),
+                      _cache[29] || (_cache[29] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+                      ia("div", _hoisted_46$2, "出现段落聚合（" + ea(mentions.value.length) + " 段）", 1 /* TEXT */),
+                      ia("div", _hoisted_47$2, [
+                        (r4(true), ie(rQ, null, lj(mentions.value, (m) => {
+                          return (r4(), ie("div", {
+                            key: m.c + '-' + m.p,
+                            class: "mention",
+                            onClick: $event => (goto(m.c, m.p))
+                          }, [
+                            ia("div", _hoisted_49$2, "卷" + ea(m.c) + " · 第 " + ea(m.p) + " 段", 1 /* TEXT */),
+                            id(" " + ea(tA(plainText)(m.o).slice(0, 66)) + "… ", 1 /* TEXT */)
+                          ], 8 /* PROPS */, _hoisted_48$2))
+                        }), 128 /* KEYED_FRAGMENT */))
+                      ])
+                    ])
+                  ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
+                : (term.value)
+                  ? (r4(), ie(rQ, { key: 2 }, [
+                      ig(" 词条 "),
+                      ia("div", null, [
+                        ia("div", _hoisted_50$2, ea(term.value.term), 1 /* TEXT */),
+                        ia("div", _hoisted_51$2, [
+                          ia("span", _hoisted_52$2, ea(term.value.category), 1 /* TEXT */)
+                        ]),
+                        ia("div", _hoisted_53$1, ea(term.value.definition), 1 /* TEXT */),
+                        _cache[30] || (_cache[30] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+                        _cache[31] || (_cache[31] = ia("div", { class: "rel-group-title" }, "相关篇目", -1 /* CACHED */)),
+                        ia("div", _hoisted_54$1, [
+                          (r4(true), ie(rQ, null, lj(term.value.chapters, (no) => {
+                            return (r4(), ie("span", {
+                              key: no,
+                              class: "rel-pill",
+                              onClick: $event => (goto(no))
+                            }, "卷" + ea(no), 9 /* TEXT, PROPS */, _hoisted_55$1))
+                          }), 128 /* KEYED_FRAGMENT */))
+                        ])
+                      ])
+                    ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
+                  : (r4(), ie("div", _hoisted_56$1, "暂无该条目。"))
+          ]))
+        : ig("v-if", true),
+      ig(" AI 对话 "),
+      (tab.value === 'chat')
+        ? (r4(), ie("div", _hoisted_57$1, [
+            ia("div", _hoisted_58$1, [
+              ia("span", null, ea(tA(store).ai && tA(store).ai.key ? "已接入：" + tA(store).ai.model : "本地检索模式"), 1 /* TEXT */),
+              _cache[32] || (_cache[32] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+              ia("button", {
+                class: "chip ghost",
+                onClick: _cache[10] || (_cache[10] = $event => (tA(store).dialogue = { kind: 'settings' }))
+              }, "设置模型")
+            ]),
+            ia("div", {
+              class: "chat-log",
+              ref_key: "logEl",
+              ref: logEl
+            }, [
+              (r4(true), ie(rQ, null, lj(msgs.value, (m, i) => {
+                return (r4(), ie("div", {
+                  key: i,
+                  class: Y(["msg", { me: m.who === 'me' }])
+                }, [
+                  ia("div", _hoisted_59$1, ea(m.who === "me" ? "我" : "史"), 1 /* TEXT */),
+                  ia("div", _hoisted_60$1, [
+                    ia("div", _hoisted_61$1, ea(m.text), 1 /* TEXT */),
+                    (r4(true), ie(rQ, null, lj(m.srcs || [], (s, j) => {
+                      return (r4(), ie("a", {
+                        key: j,
+                        class: "src",
+                        onClick: $event => (goto(s.no, s.p))
+                      }, "↗ " + ea(s.label), 9 /* TEXT, PROPS */, _hoisted_62$1))
+                    }), 128 /* KEYED_FRAGMENT */))
+                  ])
+                ], 2 /* CLASS */))
+              }), 128 /* KEYED_FRAGMENT */)),
+              (busy.value)
+                ? (r4(), ie("div", _hoisted_63$1, [...(_cache[33] || (_cache[33] = [
+                    ia("div", { class: "who" }, "史", -1 /* CACHED */),
+                    ia("div", { class: "bubble" }, "正在翻检卷帙……", -1 /* CACHED */)
+                  ]))]))
+                : ig("v-if", true)
+            ], 512 /* NEED_PATCH */),
+            ia("div", _hoisted_64$1, [
+              nu(ia("textarea", {
+                "onUpdate:modelValue": _cache[11] || (_cache[11] = $event => ((input).value = $event)),
+                placeholder: "向《史记》提问，如：项羽为何不肯过江东？",
+                onKeydown: oc(oa(ask, ["exact","prevent"]), ["enter"])
+              }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_65$1), [
+                [s4, input.value]
+              ]),
+              ia("button", {
+                class: "btn primary",
+                onClick: ask
+              }, "问")
+            ])
+          ]))
+        : ig("v-if", true)
+    ])
+  ]))
+}
+}
+
+};
+
+const _hoisted_1$j = {
+  class: "modal",
+  style: {"width":"560px"}
+};
+const _hoisted_2$j = { class: "modal-head" };
+const _hoisted_3$j = { class: "modal-body" };
+const _hoisted_4$j = { class: "setting-row" };
+const _hoisted_5$j = { class: "seg" };
+const _hoisted_6$j = ["onClick"];
+const _hoisted_7$j = { class: "setting-row" };
+const _hoisted_8$j = { class: "seg" };
+const _hoisted_9$j = { class: "setting-row" };
+const _hoisted_10$i = ["max", "value"];
+const _hoisted_11$i = { style: {"font-size":"12px","color":"var(--muted)"} };
+const _hoisted_12$i = { class: "setting-row" };
+const _hoisted_13$h = ["value"];
+const _hoisted_14$g = { style: {"font-size":"12px","color":"var(--muted)"} };
+const _hoisted_15$e = { class: "setting-row" };
+const _hoisted_16$e = { class: "seg" };
+const _hoisted_17$d = { class: "setting-row" };
+const _hoisted_18$b = { class: "seg" };
+const _hoisted_19$b = { class: "setting-row" };
+const _hoisted_20$9 = { class: "seg" };
+const _hoisted_21$9 = { class: "setting-row" };
+const _hoisted_22$8 = { class: "setting-row" };
+const _hoisted_23$8 = { class: "setting-row" };
+const _hoisted_24$7 = {
+  class: "setting-row",
+  style: {"border-bottom":"none"}
+};
+const _hoisted_25$6 = ["disabled"];
+const _hoisted_26$6 = { style: {"font-size":"12px","color":"var(--muted)"} };
+
+
+var SettingsModal = {
+  __name: 'SettingsModal',
+  emits: ["close"],
+  setup(__props) {
+
+
+const sizes = [16, 17, 18, 19, 20, 21, 22, 24];
+const modes = [
+  { k: "day", n: "日间" },
+  { k: "eye", n: "护眼" },
+  { k: "night", n: "夜间" },
+];
+function reset() {
+  Object.assign(store.settings, { mode: "day", font: "serif", size: 19, lineHeight: 2.05, layout: "dual", pinyin: false, showEntities: true });
+  toast("已恢复默认排版");
+}
+function clearAll() {
+  localStorage.removeItem("dushiji.state.v1");
+  location.reload();
+}
+
+const testing = tx(false);
+const testMsg = tx("");
+async function testAI() {
+  if (!store.ai.key) { testMsg.value = "请先填写 API Key"; return; }
+  testing.value = true;
+  testMsg.value = "";
+  try {
+    const r = await fetch(store.ai.endpoint, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${store.ai.key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: store.ai.model, messages: [{ role: "user", content: "只回复：连接成功" }], max_tokens: 16 }),
+    });
+    if (!r.ok) throw new Error("HTTP " + r.status + " " + (await r.text()).slice(0, 80));
+    const j = await r.json();
+    testMsg.value = "✓ " + (j.choices?.[0]?.message?.content || "连接成功").slice(0, 24);
+  } catch (e) {
+    testMsg.value = "✗ " + e.message.slice(0, 80);
+  }
+  testing.value = false;
+}
+
+return (_ctx, _cache) => {
+  return (r4(), ie("div", {
+    class: "overlay",
+    onClick: _cache[17] || (_cache[17] = oa($event => (_ctx.$emit('close')), ["self"]))
+  }, [
+    ia("div", _hoisted_1$j, [
+      ia("div", _hoisted_2$j, [
+        _cache[18] || (_cache[18] = ia("b", null, "阅读设置", -1 /* CACHED */)),
+        ia("button", {
+          class: "icon-btn",
+          style: {"margin-left":"auto"},
+          onClick: _cache[0] || (_cache[0] = $event => (_ctx.$emit('close')))
+        }, "✕")
+      ]),
+      ia("div", _hoisted_3$j, [
+        ia("div", _hoisted_4$j, [
+          _cache[19] || (_cache[19] = ia("span", { class: "lb" }, "阅读模式", -1 /* CACHED */)),
+          ia("div", _hoisted_5$j, [
+            (r4(), ie(rQ, null, lj(modes, (m) => {
+              return ia("button", {
+                key: m.k,
+                class: Y({ on: tA(store).settings.mode === m.k }),
+                onClick: $event => (tA(store).settings.mode = m.k)
+              }, ea(m.n), 11 /* TEXT, CLASS, PROPS */, _hoisted_6$j)
+            }), 64 /* STABLE_FRAGMENT */))
+          ])
+        ]),
+        ia("div", _hoisted_7$j, [
+          _cache[20] || (_cache[20] = ia("span", { class: "lb" }, "正文字体", -1 /* CACHED */)),
+          ia("div", _hoisted_8$j, [
+            ia("button", {
+              class: Y({ on: tA(store).settings.font === 'serif' }),
+              onClick: _cache[1] || (_cache[1] = $event => (tA(store).settings.font = 'serif'))
+            }, "宋体", 2 /* CLASS */),
+            ia("button", {
+              class: Y({ on: tA(store).settings.font === 'kai' }),
+              onClick: _cache[2] || (_cache[2] = $event => (tA(store).settings.font = 'kai'))
+            }, "楷体", 2 /* CLASS */),
+            ia("button", {
+              class: Y({ on: tA(store).settings.font === 'sans' }),
+              onClick: _cache[3] || (_cache[3] = $event => (tA(store).settings.font = 'sans'))
+            }, "黑体", 2 /* CLASS */)
+          ])
+        ]),
+        ia("div", _hoisted_9$j, [
+          _cache[21] || (_cache[21] = ia("span", { class: "lb" }, "字号", -1 /* CACHED */)),
+          ia("input", {
+            type: "range",
+            min: "0",
+            max: sizes.length - 1,
+            step: "1",
+            value: sizes.indexOf(tA(store).settings.size),
+            onInput: _cache[4] || (_cache[4] = $event => (tA(store).settings.size = sizes[$event.target.value]))
+          }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_10$i),
+          ia("span", _hoisted_11$i, ea(tA(store).settings.size) + "px", 1 /* TEXT */)
+        ]),
+        ia("div", _hoisted_12$i, [
+          _cache[22] || (_cache[22] = ia("span", { class: "lb" }, "行距", -1 /* CACHED */)),
+          ia("input", {
+            type: "range",
+            min: "1.6",
+            max: "2.6",
+            step: "0.05",
+            value: tA(store).settings.lineHeight,
+            onInput: _cache[5] || (_cache[5] = $event => (tA(store).settings.lineHeight = Number($event.target.value)))
+          }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_13$h),
+          ia("span", _hoisted_14$g, ea(tA(store).settings.lineHeight.toFixed(2)), 1 /* TEXT */)
+        ]),
+        ia("div", _hoisted_15$e, [
+          _cache[23] || (_cache[23] = ia("span", { class: "lb" }, "版式", -1 /* CACHED */)),
+          ia("div", _hoisted_16$e, [
+            ia("button", {
+              class: Y({ on: tA(store).settings.layout === 'dual' }),
+              onClick: _cache[6] || (_cache[6] = $event => (tA(store).settings.layout = 'dual'))
+            }, "文白对照", 2 /* CLASS */),
+            ia("button", {
+              class: Y({ on: tA(store).settings.layout === 'orig' }),
+              onClick: _cache[7] || (_cache[7] = $event => (tA(store).settings.layout = 'orig'))
+            }, "仅原文", 2 /* CLASS */),
+            ia("button", {
+              class: Y({ on: tA(store).settings.layout === 'trans' }),
+              onClick: _cache[8] || (_cache[8] = $event => (tA(store).settings.layout = 'trans'))
+            }, "仅译文", 2 /* CLASS */)
+          ])
+        ]),
+        ia("div", _hoisted_17$d, [
+          _cache[24] || (_cache[24] = ia("span", { class: "lb" }, "生僻字注音", -1 /* CACHED */)),
+          ia("div", _hoisted_18$b, [
+            ia("button", {
+              class: Y({ on: !tA(store).settings.pinyin }),
+              onClick: _cache[9] || (_cache[9] = $event => (tA(store).settings.pinyin = false))
+            }, "关闭", 2 /* CLASS */),
+            ia("button", {
+              class: Y({ on: tA(store).settings.pinyin }),
+              onClick: _cache[10] || (_cache[10] = $event => (tA(store).settings.pinyin = true))
+            }, "开启", 2 /* CLASS */)
+          ]),
+          _cache[25] || (_cache[25] = ia("span", { style: {"font-size":"11.5px","color":"var(--muted)"} }, "如「徇(xùn)齐」", -1 /* CACHED */))
+        ]),
+        ia("div", _hoisted_19$b, [
+          _cache[26] || (_cache[26] = ia("span", { class: "lb" }, "人物地名高亮", -1 /* CACHED */)),
+          ia("div", _hoisted_20$9, [
+            ia("button", {
+              class: Y({ on: !tA(store).settings.showEntities }),
+              onClick: _cache[11] || (_cache[11] = $event => (tA(store).settings.showEntities = false))
+            }, "关闭", 2 /* CLASS */),
+            ia("button", {
+              class: Y({ on: tA(store).settings.showEntities }),
+              onClick: _cache[12] || (_cache[12] = $event => (tA(store).settings.showEntities = true))
+            }, "开启", 2 /* CLASS */)
+          ]),
+          _cache[27] || (_cache[27] = ia("span", { style: {"font-size":"11.5px","color":"var(--muted)"} }, "点击可查看人物、地名、词条", -1 /* CACHED */))
+        ]),
+        ia("div", {
+          class: "setting-row",
+          style: {"border-bottom":"none"}
+        }, [
+          ia("button", {
+            class: "btn sm",
+            onClick: reset
+          }, "恢复默认"),
+          ia("button", {
+            class: "btn sm danger",
+            onClick: clearAll
+          }, "清除本站本地数据")
+        ]),
+        _cache[32] || (_cache[32] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+        _cache[33] || (_cache[33] = ia("div", { class: "sec-title" }, "史记助手 · 大模型", -1 /* CACHED */)),
+        _cache[34] || (_cache[34] = ia("div", {
+          class: "desc",
+          style: {"font-size":"12px","color":"var(--muted)","margin-bottom":"8px"}
+        }, " 填入任意 OpenAI 兼容接口即可让助手真正回答问题（推荐 DeepSeek）。Key 只保存在本机浏览器，不会上传到别处。 未填写时助手使用本地全文检索模式。 ", -1 /* CACHED */)),
+        ia("div", _hoisted_21$9, [
+          _cache[28] || (_cache[28] = ia("span", {
+            class: "lb",
+            style: {"min-width":"64px"}
+          }, "接口地址", -1 /* CACHED */)),
+          nu(ia("input", {
+            "onUpdate:modelValue": _cache[13] || (_cache[13] = $event => ((tA(store).ai.endpoint) = $event)),
+            class: "search-input",
+            style: {"flex":"1"},
+            placeholder: "https://api.deepseek.com/v1/chat/completions"
+          }, null, 512 /* NEED_PATCH */), [
+            [s4, tA(store).ai.endpoint]
+          ])
+        ]),
+        ia("div", _hoisted_22$8, [
+          _cache[29] || (_cache[29] = ia("span", {
+            class: "lb",
+            style: {"min-width":"64px"}
+          }, "模型名", -1 /* CACHED */)),
+          nu(ia("input", {
+            "onUpdate:modelValue": _cache[14] || (_cache[14] = $event => ((tA(store).ai.model) = $event)),
+            class: "search-input",
+            style: {"flex":"1"},
+            placeholder: "deepseek-chat"
+          }, null, 512 /* NEED_PATCH */), [
+            [s4, tA(store).ai.model]
+          ])
+        ]),
+        ia("div", _hoisted_23$8, [
+          _cache[30] || (_cache[30] = ia("span", {
+            class: "lb",
+            style: {"min-width":"64px"}
+          }, "API Key", -1 /* CACHED */)),
+          nu(ia("input", {
+            "onUpdate:modelValue": _cache[15] || (_cache[15] = $event => ((tA(store).ai.key) = $event)),
+            type: "password",
+            class: "search-input",
+            style: {"flex":"1"},
+            placeholder: "sk-...",
+            autocomplete: "off"
+          }, null, 512 /* NEED_PATCH */), [
+            [s4, tA(store).ai.key]
+          ])
+        ]),
+        ia("div", _hoisted_24$7, [
+          ia("button", {
+            class: "btn sm",
+            onClick: testAI,
+            disabled: testing.value
+          }, ea(testing.value ? "测试中…" : "测试连接"), 9 /* TEXT, PROPS */, _hoisted_25$6),
+          ia("span", _hoisted_26$6, ea(testMsg.value), 1 /* TEXT */),
+          _cache[31] || (_cache[31] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+          ia("button", {
+            class: "btn sm danger",
+            onClick: _cache[16] || (_cache[16] = $event => {tA(store).ai.key = ''; testMsg.value = '已清除 Key';})
+          }, "清除 Key")
+        ])
+      ])
+    ])
+  ]))
+}
+}
+
+};
+
+const _hoisted_1$i = { class: "modal" };
+const _hoisted_2$i = { class: "modal-head" };
+const _hoisted_3$i = { key: 0 };
+const _hoisted_4$i = { key: 1 };
+const _hoisted_5$i = { key: 2 };
+const _hoisted_6$i = { key: 3 };
+const _hoisted_7$i = { class: "modal-body" };
+const _hoisted_8$i = {
+  class: "desc",
+  style: {"font-family":"var(--serif)","font-size":"15px","color":"var(--ink)"}
+};
+const _hoisted_9$i = {
+  key: 0,
+  class: "desc",
+  style: {"margin-top":"10px"}
+};
+const _hoisted_10$h = { style: {"display":"flex","gap":"8px","margin-top":"16px"} };
+const _hoisted_11$h = { style: {"font-family":"var(--serif)"} };
+const _hoisted_12$h = {
+  class: "desc",
+  style: {"margin-top":"4px"}
+};
+const _hoisted_13$g = { style: {"display":"flex","align-items":"baseline","gap":"8px"} };
+const _hoisted_14$f = { style: {"font-family":"var(--serif)","font-size":"16px"} };
+const _hoisted_15$d = { style: {"font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_16$d = {
+  class: "poem",
+  style: {"margin-top":"6px"}
+};
+const _hoisted_17$c = {
+  class: "desc",
+  style: {"margin-top":"6px","color":"var(--ink-3)"}
+};
+
+
+var DialogueHost = {
+  __name: 'DialogueHost',
+  setup(__props) {
+
+const d = iD(() => store.dialogue);
+function close() { store.dialogue = null; }
+function del(a) {
+  removeAnnotation(a.id);
+  store.toast = "批注已删除";
+  setTimeout(() => (store.toast = ""), 1600);
+  close();
+}
+
+return (_ctx, _cache) => {
+  return (d.value && d.value.kind !== 'settings')
+    ? (r4(), ie("div", {
+        key: 0,
+        class: "overlay",
+        onClick: oa(close, ["self"])
+      }, [
+        ia("div", _hoisted_1$i, [
+          ia("div", _hoisted_2$i, [
+            (d.value.kind === 'annotation')
+              ? (r4(), ie("b", _hoisted_3$i, "我的批注"))
+              : (d.value.kind === 'notes')
+                ? (r4(), ie("b", _hoisted_4$i, "注释"))
+                : (d.value.kind === 'poems')
+                  ? (r4(), ie("b", _hoisted_5$i, "后人咏史"))
+                  : (r4(), ie("b", _hoisted_6$i, "详情")),
+            ia("button", {
+              class: "icon-btn",
+              style: {"margin-left":"auto"},
+              onClick: close
+            }, "✕")
+          ]),
+          ia("div", _hoisted_7$i, [
+            (d.value.kind === 'annotation')
+              ? (r4(), ie(rQ, { key: 0 }, [
+                  ia("div", _hoisted_8$i, " 「" + ea(d.value.data.quote) + "」 ", 1 /* TEXT */),
+                  (d.value.data.note)
+                    ? (r4(), ie("div", _hoisted_9$i, "批注：" + ea(d.value.data.note), 1 /* TEXT */))
+                    : ig("v-if", true),
+                  ia("div", _hoisted_10$h, [
+                    ia("button", {
+                      class: "btn sm",
+                      onClick: _cache[0] || (_cache[0] = $event => {tA(go)(`/c/${d.value.data.chapter}/${d.value.data.para}`); close();})
+                    }, "定位到原文"),
+                    _cache[2] || (_cache[2] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+                    ia("button", {
+                      class: "btn sm danger",
+                      onClick: _cache[1] || (_cache[1] = $event => (del(d.value.data)))
+                    }, "删除批注")
+                  ])
+                ], 64 /* STABLE_FRAGMENT */))
+              : (d.value.kind === 'notes')
+                ? (r4(true), ie(rQ, { key: 1 }, lj(d.value.data, (n) => {
+                    return (r4(), ie("div", {
+                      key: n.n,
+                      style: {"padding":"8px 0","border-bottom":"1px dashed var(--line-2)"}
+                    }, [
+                      ia("b", _hoisted_11$h, ea(n.n) + ". " + ea(n.term), 1 /* TEXT */),
+                      ia("div", _hoisted_12$h, ea(n.text), 1 /* TEXT */)
+                    ]))
+                  }), 128 /* KEYED_FRAGMENT */))
+                : (d.value.kind === 'poems')
+                  ? (r4(true), ie(rQ, { key: 2 }, lj(d.value.data, (p) => {
+                      return (r4(), ie("div", {
+                        key: p.id,
+                        style: {"padding":"12px 0","border-bottom":"1px dashed var(--line-2)"}
+                      }, [
+                        ia("div", _hoisted_13$g, [
+                          ia("b", _hoisted_14$f, ea(p.title), 1 /* TEXT */),
+                          ia("span", _hoisted_15$d, ea(p.dynasty) + " · " + ea(p.author), 1 /* TEXT */)
+                        ]),
+                        ia("div", _hoisted_16$d, [
+                          (r4(true), ie(rQ, null, lj(p.lines, (l, i) => {
+                            return (r4(), ie("span", {
+                              key: i,
+                              class: "l"
+                            }, ea(l), 1 /* TEXT */))
+                          }), 128 /* KEYED_FRAGMENT */))
+                        ]),
+                        ia("div", _hoisted_17$c, ea(p.note), 1 /* TEXT */)
+                      ]))
+                    }), 128 /* KEYED_FRAGMENT */))
+                  : ig("v-if", true)
+          ])
+        ])
+      ]))
+    : ig("v-if", true)
+}
+}
+
+};
+
+// 极简 Markdown 渲染（标题 / 粗体 / 列表 / 引用 / 段落 / [[篇名]] 链接文本）
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function renderMD(md) {
+  if (!md) return "";
+  const lines = md.replace(/\r/g, "").split("\n");
+  const out = [];
+  let inUl = false;
+  const closeUl = () => { if (inUl) { out.push("</ul>"); inUl = false; } };
+
+  for (let raw of lines) {
+    const line = raw.trimEnd();
+    if (!line.trim()) { closeUl(); continue; }
+
+    const h = line.match(/^(#{1,5})\s+(.+)$/);
+    if (h) {
+      closeUl();
+      const lv = Math.min(5, h[1].length + 2);
+      out.push(`<h${lv} class="md-h">${inline(h[2])}</h${lv}>`);
+      continue;
+    }
+    const li = line.match(/^\s*[-*]\s+(.+)$/);
+    if (li) {
+      if (!inUl) { out.push('<ul class="md-ul">'); inUl = true; }
+      out.push(`<li>${inline(li[1])}</li>`);
+      continue;
+    }
+    if (/^>\s?/.test(line)) {
+      closeUl();
+      out.push(`<blockquote class="md-q">${inline(line.replace(/^>\s?/, ""))}</blockquote>`);
+      continue;
+    }
+    if (/^[-*_]{3,}$/.test(line.trim())) { closeUl(); out.push("<hr />"); continue; }
+    closeUl();
+    out.push(`<p class="md-p">${inline(line)}</p>`);
+  }
+  closeUl();
+  return out.join("");
+}
+
+function inline(s) {
+  let t = esc(s);
+  t = t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
+  t = t.replace(/\[\[(.+?)\]\]/g, "$1");
+  t = t.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+  return t;
+}
+
+const _hoisted_1$h = { class: "annot-panel" };
+const _hoisted_2$h = { class: "as-head" };
+const _hoisted_3$h = { style: {"font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_4$h = { style: {"padding":"8px 12px","display":"flex","gap":"6px","flex-wrap":"wrap","border-bottom":"1px solid var(--line-2)"} };
+const _hoisted_5$h = {
+  class: "as-body",
+  style: {"padding":"10px 12px"}
+};
+const _hoisted_6$h = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_7$h = { class: "annot-meta" };
+const _hoisted_8$h = { style: {"margin-left":"auto","font-size":"10.5px","color":"var(--muted)"} };
+const _hoisted_9$h = ["onClick"];
+const _hoisted_10$g = { style: {"display":"flex","gap":"6px","margin-top":"6px"} };
+const _hoisted_11$g = ["onClick"];
+const _hoisted_12$g = {
+  key: 0,
+  class: "annot-note"
+};
+const _hoisted_13$f = { class: "annot-actions" };
+const _hoisted_14$e = ["onClick"];
+const _hoisted_15$c = ["onClick"];
+const _hoisted_16$c = ["onClick"];
+
+
+var AnnotationPanel = {
+  __name: 'AnnotationPanel',
+  props: { chapter: { type: Number, default: 1 } },
+  emits: ["close"],
+  setup(__props, { emit: __emit }) {
+
+const props = __props;
+const emit = __emit;
+
+const scope = tx("chapter");
+const editing = tx(null);
+const editText = tx("");
+
+const list = iD(() => {
+  const all = [...store.annotations].sort((a, b) => (a.chapter - b.chapter) || (a.para - b.para));
+  if (scope.value === "chapter") return all.filter((a) => a.chapter === props.chapter);
+  return all;
+});
+
+const titleOf = (no) => store.index?.chapters.find((c) => c.no === Number(no))?.title || "";
+
+function jump(a) {
+  go(`/c/${a.chapter}/${a.para}`);
+}
+function startEdit(a) {
+  editing.value = a.id;
+  editText.value = a.note || "";
+}
+function saveEdit(a) {
+  updateAnnotation(a.id, { note: editText.value.trim() });
+  editing.value = null;
+  editText.value = "";
+}
+function del(a) {
+  removeAnnotation(a.id);
+  toast("批注已删除");
+}
+
+function exportJSON() {
+  const data = JSON.stringify({ version: 1, annotations: store.annotations }, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `读史记-批注-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("已导出批注");
+}
+
+const fileEl = tx(null);
+function importJSON(e) {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const obj = JSON.parse(String(reader.result));
+      const arr = Array.isArray(obj) ? obj : obj.annotations || [];
+      const valid = arr.filter((x) => x && x.chapter && x.para && x.quote);
+      const exist = new Set(store.annotations.map((a) => a.chapter + ":" + a.para + ":" + a.quote));
+      const add = valid.filter((x) => !exist.has(x.chapter + ":" + x.para + ":" + x.quote));
+      store.annotations = [...store.annotations, ...add.map((x) => ({ id: "a" + Math.random().toString(36).slice(2), ts: Date.now(), color: x.color || "hl-y", ...x }))];
+      toast(`导入 ${add.length} 条批注`);
+    } catch (err) {
+      toast("导入失败：文件格式不对");
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = "";
+}
+
+return (_ctx, _cache) => {
+  return (r4(), ie("aside", _hoisted_1$h, [
+    ia("div", _hoisted_2$h, [
+      _cache[6] || (_cache[6] = ia("b", { style: {"font-family":"var(--serif)","font-size":"15px"} }, "批注", -1 /* CACHED */)),
+      ia("span", _hoisted_3$h, ea(list.value.length) + " 条", 1 /* TEXT */),
+      ia("button", {
+        class: "icon-btn",
+        style: {"margin-left":"auto"},
+        onClick: _cache[0] || (_cache[0] = $event => (emit('close')))
+      }, "✕")
+    ]),
+    ia("div", _hoisted_4$h, [
+      ia("button", {
+        class: Y(["filter-pill", { on: scope.value === 'chapter' }]),
+        onClick: _cache[1] || (_cache[1] = $event => (scope.value = 'chapter'))
+      }, "本篇", 2 /* CLASS */),
+      ia("button", {
+        class: Y(["filter-pill", { on: scope.value === 'all' }]),
+        onClick: _cache[2] || (_cache[2] = $event => (scope.value = 'all'))
+      }, "全部", 2 /* CLASS */),
+      _cache[7] || (_cache[7] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+      ia("button", {
+        class: "chip ghost",
+        onClick: exportJSON
+      }, "导出"),
+      ia("button", {
+        class: "chip ghost",
+        onClick: _cache[3] || (_cache[3] = $event => (fileEl.value.click()))
+      }, "导入"),
+      ia("input", {
+        ref_key: "fileEl",
+        ref: fileEl,
+        type: "file",
+        accept: "application/json",
+        style: {"display":"none"},
+        onChange: importJSON
+      }, null, 544 /* NEED_HYDRATION, NEED_PATCH */)
+    ]),
+    ia("div", _hoisted_5$h, [
+      (!list.value.length)
+        ? (r4(), ie("div", _hoisted_6$h, " 还没有批注。阅读时选中原文，即可划线并写下批注；批注会实时显示在正文中，并汇总在这里。 "))
+        : ig("v-if", true),
+      (r4(true), ie(rQ, null, lj(list.value, (a) => {
+        return (r4(), ie("div", {
+          key: a.id,
+          class: "annot-item"
+        }, [
+          ia("div", _hoisted_7$h, [
+            ia("span", null, "卷" + ea(a.chapter) + " · " + ea(titleOf(a.chapter)) + " · 第 " + ea(a.para) + " 段", 1 /* TEXT */),
+            ia("span", _hoisted_8$h, ea(new Date(a.ts).toLocaleDateString("zh-CN")), 1 /* TEXT */)
+          ]),
+          ia("div", {
+            class: Y(["annot-quote", a.color]),
+            onClick: $event => (jump(a))
+          }, "「" + ea(a.quote) + "」", 11 /* TEXT, CLASS, PROPS */, _hoisted_9$h),
+          (editing.value === a.id)
+            ? (r4(), ie(rQ, { key: 0 }, [
+                nu(ia("textarea", {
+                  "onUpdate:modelValue": _cache[4] || (_cache[4] = $event => ((editText).value = $event)),
+                  class: "annot-edit",
+                  placeholder: "批注内容"
+                }, null, 512 /* NEED_PATCH */), [
+                  [s4, editText.value]
+                ]),
+                ia("div", _hoisted_10$g, [
+                  ia("button", {
+                    class: "btn sm primary",
+                    onClick: $event => (saveEdit(a))
+                  }, "保存", 8 /* PROPS */, _hoisted_11$g),
+                  ia("button", {
+                    class: "btn sm",
+                    onClick: _cache[5] || (_cache[5] = $event => (editing.value = null))
+                  }, "取消")
+                ])
+              ], 64 /* STABLE_FRAGMENT */))
+            : (r4(), ie(rQ, { key: 1 }, [
+                (a.note)
+                  ? (r4(), ie("div", _hoisted_12$g, ea(a.note), 1 /* TEXT */))
+                  : ig("v-if", true),
+                ia("div", _hoisted_13$f, [
+                  ia("button", {
+                    class: "chip ghost",
+                    onClick: $event => (jump(a))
+                  }, "定位", 8 /* PROPS */, _hoisted_14$e),
+                  ia("button", {
+                    class: "chip ghost",
+                    onClick: $event => (startEdit(a))
+                  }, ea(a.note ? "编辑" : "补写"), 9 /* TEXT, PROPS */, _hoisted_15$c),
+                  ia("button", {
+                    class: "chip ghost",
+                    onClick: $event => (del(a))
+                  }, "删除", 8 /* PROPS */, _hoisted_16$c)
+                ])
+              ], 64 /* STABLE_FRAGMENT */))
+        ]))
+      }), 128 /* KEYED_FRAGMENT */))
+    ])
+  ]))
+}
+}
+
+};
+
+const _hoisted_1$g = { class: "reader-bar" };
+const _hoisted_2$g = { class: "crumb" };
+const _hoisted_3$g = { style: {"font-size":"11.5px"} };
+const _hoisted_4$g = { class: "reader-tools" };
+const _hoisted_5$g = {
+  class: "seg",
+  title: "版式"
+};
+const _hoisted_6$g = { class: "reading" };
+const _hoisted_7$g = { class: "chapter-head" };
+const _hoisted_8$g = { class: "cat" };
+const _hoisted_9$g = { class: "meta" };
+const _hoisted_10$f = { key: 0 };
+const _hoisted_11$f = { key: 1 };
+const _hoisted_12$f = {
+  key: 0,
+  class: "panel",
+  style: {"margin-bottom":"22px"}
+};
+const _hoisted_13$e = { class: "panel-head" };
+const _hoisted_14$d = {
+  key: 0,
+  class: "panel-body"
+};
+const _hoisted_15$b = {
+  class: "desc",
+  style: {"white-space":"pre-line"}
+};
+const _hoisted_16$b = {
+  class: "para-chips",
+  style: {"margin-top":"12px"}
+};
+const _hoisted_17$b = ["onClick"];
+const _hoisted_18$a = ["onClick"];
+const _hoisted_19$a = ["id"];
+const _hoisted_20$8 = {
+  key: 0,
+  class: "para-sec"
+};
+const _hoisted_21$8 = { class: "para-chips" };
+const _hoisted_22$7 = ["onClick"];
+const _hoisted_23$7 = ["onClick"];
+const _hoisted_24$6 = ["onClick"];
+const _hoisted_25$5 = ["onClick"];
+const _hoisted_26$5 = ["onClick"];
+const _hoisted_27$5 = ["onClick"];
+const _hoisted_28$4 = ["onClick"];
+const _hoisted_29$4 = {
+  class: "para-no",
+  style: {"position":"static"}
+};
+const _hoisted_30$4 = { class: "pcols" };
+const _hoisted_31$4 = { class: "para" };
+const _hoisted_32$4 = ["innerHTML"];
+const _hoisted_33$3 = { class: "para" };
+const _hoisted_34$2 = {
+  key: 0,
+  class: "text-trans"
+};
+const _hoisted_35$2 = {
+  key: 1,
+  class: "text-trans",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_36$2 = {
+  key: 1,
+  class: "desc",
+  style: {"text-align":"center","padding":"60px","color":"var(--muted)"}
+};
+const _hoisted_37$1 = {
+  key: 2,
+  style: {"margin-top":"34px"}
+};
+const _hoisted_38$1 = { class: "panel-head" };
+const _hoisted_39$1 = { class: "panel-body" };
+const _hoisted_40$1 = ["innerHTML"];
+const _hoisted_41$1 = {
+  class: "panel",
+  style: {"margin-top":"20px"}
+};
+const _hoisted_42$1 = { class: "panel-head" };
+const _hoisted_43$1 = { style: {"margin-left":"auto","font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_44$1 = {
+  key: 0,
+  class: "panel-body"
+};
+const _hoisted_45$1 = { style: {"font-family":"var(--serif)","color":"var(--ink)"} };
+const _hoisted_46$1 = { class: "desc" };
+const _hoisted_47$1 = { style: {"display":"flex","gap":"10px","margin-top":"26px","flex-wrap":"wrap"} };
+const _hoisted_48$1 = { style: {"display":"flex","align-items":"center","gap":"8px","margin-bottom":"6px"} };
+const _hoisted_49$1 = { style: {"font-size":"11px","color":"var(--muted)"} };
+const _hoisted_50$1 = { style: {"display":"flex","gap":"6px","margin-top":"6px"} };
+const _hoisted_51$1 = ["onClick"];
+const _hoisted_52$1 = {
+  key: 0,
+  class: "annot-note"
+};
+const _hoisted_53 = { style: {"display":"flex","gap":"6px","margin-top":"4px"} };
+const _hoisted_54 = ["onClick"];
+const _hoisted_55 = ["onClick"];
+const _hoisted_56 = { style: {"font-family":"var(--serif)","font-size":"13px","color":"var(--ink-2)","max-height":"54px","overflow":"hidden"} };
+const _hoisted_57 = { class: "row" };
+const _hoisted_58 = ["onClick"];
+const _hoisted_59 = { style: {"font-size":"11px","color":"var(--muted)","margin-bottom":"4px"} };
+const _hoisted_60 = { style: {"font-family":"var(--serif)"} };
+const _hoisted_61 = {
+  class: "desc",
+  style: {"margin-top":"6px"}
+};
+const _hoisted_62 = {
+  class: "modal",
+  style: {"width":"680px"}
+};
+const _hoisted_63 = { class: "modal-head" };
+const _hoisted_64 = { class: "modal-body" };
+const _hoisted_65 = { style: {"display":"flex","gap":"8px","align-items":"center","margin-bottom":"6px"} };
+const _hoisted_66 = {
+  class: "vip-tag",
+  style: {"background":"var(--accent-soft)","color":"var(--accent)"}
+};
+const _hoisted_67 = { style: {"font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_68 = {
+  class: "mini-pill",
+  style: {"margin-left":"auto"}
+};
+const _hoisted_69 = {
+  class: "desc",
+  style: {"font-family":"var(--serif)","font-size":"14px","line-height":"1.9"}
+};
+const _hoisted_70 = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_71 = {
+  class: "modal",
+  style: {"width":"820px"}
+};
+const _hoisted_72 = { class: "modal-head" };
+const _hoisted_73 = { style: {"font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_74 = { class: "modal-body" };
+const _hoisted_75 = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_76 = { class: "hs-head" };
+const _hoisted_77 = ["onClick"];
+const _hoisted_78 = { class: "hs-orig" };
+const _hoisted_79 = {
+  key: 0,
+  class: "hs-trans"
+};
+
+
+var ReaderView = {
+  __name: 'ReaderView',
+  props: { route: { type: Object, required: true } },
+  setup(__props) {
+
+const props = __props;
+
+const annotText = tx("");
+const annotColor = tx("hl-y");
+const winW = tx(typeof window !== "undefined" ? window.innerWidth : 1200);
+const onResize = () => { winW.value = window.innerWidth; };
+
+const matcher = iD(() => buildMatcher(store.entities));
+const renderCache = new Map();
+const showIntro = tx(true);
+const notesOpen = tx(false);
+const companionsOpen = tx(false);
+const annotOpen = tx(false);
+const myAnnots = iD(() => store.annotations.filter((a) => a.chapter === Number(props.route.no)));
+
+/* 批注就地查看 */
+const annPop = tx(null);
+const editingAnn = tx(null);
+const editingText = tx("");
+const annCount = (para) => myAnnots.value.filter((a) => a.para === para).length;
+function paraAnnotations(para) { return myAnnots.value.filter((a) => a.para === para).sort((a, b) => a.ts - b.ts); }
+function openAnnPop(para, evt) {
+  const items = paraAnnotations(para);
+  if (!items.length) return;
+  const r = evt.currentTarget.getBoundingClientRect();
+  annPop.value = { x: r.left + window.scrollX, y: r.top + window.scrollY + 26, para, items };
+  notePop.value = null;
+  sel.value = null;
+}
+function saveAnnEdit(a) {
+  updateAnnotation(a.id, { note: editingText.value.trim() });
+  editingAnn.value = null;
+  if (annPop.value) annPop.value.items = annPop.value.items.map((x) => (x.id === a.id ? { ...x, note: editingText.value.trim() } : x));
+}
+function delAnn(a) {
+  removeAnnotation(a.id);
+  if (!annPop.value) return;
+  const items = annPop.value.items.filter((x) => x.id !== a.id);
+  annPop.value = items.length ? { ...annPop.value, items } : null;
+}
+const annPopStyle = iD(() => {
+  if (!annPop.value) return {};
+  const left = Math.min(Math.max(annPop.value.x - 160, 12), winW.value - 360);
+  return { left: left + "px", top: annPop.value.y + "px" };
+});
+const sel = tx(null);
+const notePop = tx(null);
+
+const chapter = iD(() => store.chapter);
+const paras = iD(() => chapter.value?.paras || []);
+const notes = iD(() => chapter.value?.notes || []);
+const meta = iD(() => store.index?.chapters.find((c) => c.no === Number(props.route.no)));
+const companions = iD(() => (store.companions?.companions || []).filter((c) => c.chapter === Number(props.route.no)));
+const poems = iD(() => (store.poems?.poems || []).filter((p) => (p.chapters || []).includes(Number(props.route.no))));
+const campaigns = iD(() => (store.campaigns?.campaigns || []).filter((c) => Number(c.chapter) === Number(props.route.no)));
+
+/* 本篇战役里出现的地名：点一下就能看该地地图与沙盘 */
+const campaignPlaces = iD(() => {
+  const set = new Set();
+  for (const c of campaigns.value) for (const st of c.steps || []) for (const m of st.markers || []) set.add(m.name);
+  return [...set];
+});
+function sandboxPlacesIn(text) {
+  const plain = plainText(text);
+  return campaignPlaces.value.filter((n) => plain.includes(n)).slice(0, 1);
+}
+function openPlaceByName(name) {
+  const p = (store.places?.places || []).find((x) => x.name === name || (x.aliases || []).includes(name));
+  if (p) {
+    store.panel = { type: "place", id: p.id };
+    store.assistant = true;
+  }
+}
+
+/* 《汉书》资料对照 */
+const hsLinks = iD(() => (store.hanshuLinks?.links || {})[Number(props.route.no)] || {});
+const hsMap = iD(() => (store.hanshuMap?.map || []).filter((m) => m.shiji === Number(props.route.no)));
+const hsTitle = (id) => (store.hanshuIndex?.chapters || []).find((c) => c.id === id)?.title || id;
+const hsDrawer = tx(null);
+const hsLoading = tx(false);
+async function openHanshu(pi) {
+  const arr = hsLinks.value[pi] || [];
+  if (!arr.length) return;
+  hsLoading.value = true;
+  hsDrawer.value = { items: [], para: pi };
+  const items = [];
+  for (const l of arr) {
+    try {
+      const ch = await loadHanshuText(l.h);
+      items.push({ id: l.h, p: l.p, title: ch.title, text: ch.paras[l.p] || "", trans: (ch.trans || [])[l.p] || "" });
+    } catch {}
+  }
+  hsDrawer.value = { items, para: pi };
+  hsLoading.value = false;
+}
+
+function entitiesIn(text) {
+  const m = matcher.value;
+  if (!m || !m.re) return [];
+  m.re.lastIndex = 0;
+  const found = new Map();
+  const plain = plainText(text);
+  let hit;
+  while ((hit = m.re.exec(plain))) {
+    const ent = m.map.get(hit[0]);
+    if (ent) found.set(ent.id, ent);
+  }
+  return [...found.values()];
+}
+function personsIn(text) {
+  return entitiesIn(text).filter((x) => x.type === "person");
+}
+function notesIn(text) {
+  const plain = plainText(text);
+  return notes.value.filter((n) => {
+    const t = (n.term || "").split(/[、，,／/]/)[0].trim();
+    return t && t.length >= 2 && plain.includes(t);
+  });
+}
+function isTaishi(sec) { return !!sec && sec.indexOf("太史公") >= 0; }
+
+function render(p, i) {
+  const key = `${props.route.no}:${i}`;
+  const anns = store.annotations.filter((a) => a.chapter === Number(props.route.no) && a.para === i + 1);
+  const sig = JSON.stringify([store.settings.pinyin, store.settings.showEntities, anns.map((a) => a.id + a.color)]);
+  const cached = renderCache.get(key);
+  if (cached && cached.sig === sig) return cached.html;
+  const html = renderParagraph(p.o, {
+    matcher: matcher.value,
+    notes: notes.value,
+    annotations: anns,
+    pinyin: store.settings.pinyin,
+    showEntities: store.settings.showEntities,
+  });
+  renderCache.set(key, { sig, html });
+  return html;
+}
+
+function secChanged(i) {
+  if (i === 0) return true;
+  return paras.value[i].sec !== paras.value[i - 1].sec;
+}
+
+/* 交互 */
+function onReadingClick(e) {
+  const ent = e.target.closest("[data-ent]");
+  if (ent) {
+    store.panel = { type: ent.dataset.ent, id: ent.dataset.id };
+    store.assistant = true;
+    return;
+  }
+  const note = e.target.closest("[data-note]");
+  if (note) {
+    const n = Number(note.dataset.note);
+    const found = notes.value.find((x) => x.n === n);
+    if (found) {
+      const r = note.getBoundingClientRect();
+      notePop.value = { ...found, x: r.left + window.scrollX, y: r.top + window.scrollY + 26 };
+    }
+    return;
+  }
+  const ann = e.target.closest("[data-ann]");
+  if (ann) {
+    const holder = ann.closest("[id^='p-']");
+    if (holder) {
+      openAnnPop(Number(holder.id.slice(2)), e);
+    } else {
+      const found = store.annotations.find((a) => a.id === ann.dataset.ann);
+      if (found) store.dialogue = { kind: "annotation", data: found };
+    }
+  }
+}
+
+function onMouseUp(e) {
+  const box = e.currentTarget;
+  setTimeout(() => {
+    const s = window.getSelection();
+    if (!s || s.isCollapsed) return;
+    const txt = s.toString().trim();
+    if (txt.length < 2 || txt.length > 160) return;
+    const holder = s.anchorNode && s.anchorNode.parentElement ? s.anchorNode.parentElement.closest("[id^='p-']") : null;
+    if (!holder || !box.contains(holder)) return;
+    const rect = s.getRangeAt(0).getBoundingClientRect();
+    if (!rect.width) return;
+    sel.value = {
+      chapter: Number(props.route.no),
+      para: Number(holder.id.slice(2)),
+      text: txt,
+      x: rect.left + rect.width / 2,
+      y: rect.top + window.scrollY + 26,
+    };
+    notePop.value = null;
+  }, 10);
+}
+
+function saveAnnotation() {
+  if (!sel.value) return;
+  addAnnotation({ chapter: sel.value.chapter, para: sel.value.para, quote: sel.value.text, note: annotText.value, color: annotColor.value });
+  sel.value = null;
+  annotText.value = "";
+  window.getSelection()?.removeAllRanges();
+  store.toast = "批注已保存";
+  setTimeout(() => (store.toast = ""), 1800);
+}
+
+/* 进度 */
+let io = null;
+function setupObserver() {
+  if (io) io.disconnect();
+  io = new IntersectionObserver((entries) => {
+    for (const en of entries) {
+      if (en.isIntersecting) {
+        const n = Number(en.target.id.slice(2));
+        store.currentPara = n;
+        setProgress(props.route.no, n);
+      }
+    }
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  t8(() => document.querySelectorAll("[id^='p-']").forEach((el) => io.observe(el)));
+}
+
+ny(() => store.chapter, () => {
+  renderCache.clear();
+  t8(setupObserver);
+}, { immediate: true });
+
+lS(() => {
+  setupObserver();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onResize);
+});
+lw(() => {
+  if (io) io.disconnect();
+  window.removeEventListener("scroll", onScroll);
+  window.removeEventListener("resize", onResize);
+});
+function onScroll() {
+  if (sel.value) sel.value = null;
+  if (notePop.value) notePop.value = null;
+}
+
+const prevNo = iD(() => (props.route.no > 1 ? props.route.no - 1 : null));
+const nextNo = iD(() => (props.route.no < 130 ? props.route.no + 1 : null));
+const prevTitle = iD(() => store.index?.chapters.find((c) => c.no === prevNo.value)?.title);
+const nextTitle = iD(() => store.index?.chapters.find((c) => c.no === nextNo.value)?.title);
+
+const selStyle = iD(() => {
+  if (!sel.value) return {};
+  const left = Math.min(Math.max(sel.value.x - 150, 12), winW.value - 320);
+  return { left: left + "px", top: sel.value.y + "px" };
+});
+const noteStyle = iD(() => {
+  if (!notePop.value) return {};
+  const left = Math.min(Math.max(notePop.value.x - 150, 12), winW.value - 320);
+  return { left: left + "px", top: notePop.value.y + "px" };
+});
+
+function openPerson(id) { store.panel = { type: "person", id }; store.assistant = true; }
+function openSandbox(id) { go("/sandbox/" + id); }
+function copyLink(i) {
+  const url = `${location.origin}${location.pathname}#/c/${props.route.no}/${i + 1}`;
+  if (navigator.clipboard) navigator.clipboard.writeText(url);
+  store.toast = "段落链接已复制";
+  setTimeout(() => (store.toast = ""), 1600);
+}
+
+return (_ctx, _cache) => {
+  return (r4(), ie(rQ, null, [
+    ia("div", _hoisted_1$g, [
+      ia("button", {
+        class: Y(["icon-btn", { on: tA(store).tocOpen }]),
+        title: "目录",
+        onClick: _cache[0] || (_cache[0] = $event => (tA(store).tocOpen = !tA(store).tocOpen))
+      }, "☰", 2 /* CLASS */),
+      ia("div", _hoisted_2$g, [
+        _cache[30] || (_cache[30] = ia("span", null, "史记", -1 /* CACHED */)),
+        _cache[31] || (_cache[31] = ia("span", { class: "sep" }, "/", -1 /* CACHED */)),
+        ia("b", null, ea(chapter.value ? chapter.value.cat : ""), 1 /* TEXT */),
+        _cache[32] || (_cache[32] = ia("span", { class: "sep" }, "/", -1 /* CACHED */)),
+        ia("b", null, ea(chapter.value ? chapter.value.title : ""), 1 /* TEXT */),
+        _cache[33] || (_cache[33] = ia("span", { class: "sep" }, "·", -1 /* CACHED */)),
+        ia("span", _hoisted_3$g, "第 " + ea(tA(store).currentPara || 1) + " / " + ea(paras.value.length) + " 段", 1 /* TEXT */)
+      ]),
+      ia("div", _hoisted_4$g, [
+        ia("div", _hoisted_5$g, [
+          ia("button", {
+            class: Y({ on: tA(store).settings.layout === 'dual' }),
+            onClick: _cache[1] || (_cache[1] = $event => (tA(store).settings.layout = 'dual'))
+          }, "对照", 2 /* CLASS */),
+          ia("button", {
+            class: Y({ on: tA(store).settings.layout === 'orig' }),
+            onClick: _cache[2] || (_cache[2] = $event => (tA(store).settings.layout = 'orig'))
+          }, "原文", 2 /* CLASS */),
+          ia("button", {
+            class: Y({ on: tA(store).settings.layout === 'trans' }),
+            onClick: _cache[3] || (_cache[3] = $event => (tA(store).settings.layout = 'trans'))
+          }, "译文", 2 /* CLASS */)
+        ]),
+        ia("button", {
+          class: Y(["chip ghost", { on: tA(store).settings.pinyin }]),
+          onClick: _cache[4] || (_cache[4] = $event => (tA(store).settings.pinyin = !tA(store).settings.pinyin))
+        }, " 注音" + ea(tA(store).settings.pinyin ? " · 开" : ""), 3 /* TEXT, CLASS */),
+        ia("button", {
+          class: "chip ghost",
+          onClick: _cache[5] || (_cache[5] = $event => (companionsOpen.value = true))
+        }, "伴读" + ea(companions.value.length ? " " + companions.value.length : ""), 1 /* TEXT */),
+        ia("button", {
+          class: Y(["chip ghost", { on: annotOpen.value }]),
+          onClick: _cache[6] || (_cache[6] = $event => (annotOpen.value = !annotOpen.value))
+        }, "批注" + ea(myAnnots.value.length ? " " + myAnnots.value.length : ""), 3 /* TEXT, CLASS */),
+        ia("button", {
+          class: "icon-btn",
+          title: "阅读设置",
+          onClick: _cache[7] || (_cache[7] = $event => (tA(store).dialogue = { kind: 'settings' }))
+        }, "⚙")
+      ])
+    ]),
+    ia("div", {
+      class: "reading-wrap",
+      onMouseup: onMouseUp,
+      onClick: onReadingClick
+    }, [
+      ia("div", _hoisted_6$g, [
+        ia("div", _hoisted_7$g, [
+          ia("div", _hoisted_8$g, ea(chapter.value ? chapter.value.cat : "") + " · 卷" + ea(String(__props.route.no).padStart(3, "0")), 1 /* TEXT */),
+          ia("h1", null, ea(chapter.value ? chapter.value.title : ""), 1 /* TEXT */),
+          ia("div", _hoisted_9$g, [
+            id(ea(meta.value ? meta.value.chars.toLocaleString() : 0) + " 字 · " + ea(paras.value.length) + " 段 · 注 " + ea(notes.value.length) + " 条 ", 1 /* TEXT */),
+            (companions.value.length)
+              ? (r4(), ie("span", _hoisted_10$f, " · 伴读 " + ea(companions.value.length), 1 /* TEXT */))
+              : ig("v-if", true),
+            (poems.value.length)
+              ? (r4(), ie("span", _hoisted_11$f, " · 相关诗词 " + ea(poems.value.length), 1 /* TEXT */))
+              : ig("v-if", true)
+          ]),
+          _cache[34] || (_cache[34] = ia("div", { class: "rule" }, null, -1 /* CACHED */))
+        ]),
+        (chapter.value && chapter.value.intro)
+          ? (r4(), ie("div", _hoisted_12$f, [
+              ia("div", _hoisted_13$e, [
+                _cache[35] || (_cache[35] = ia("b", null, "本篇导读", -1 /* CACHED */)),
+                _cache[36] || (_cache[36] = ia("span", { style: {"margin-left":"auto","font-size":"11.5px","color":"var(--muted)"} }, "编者按", -1 /* CACHED */)),
+                ia("button", {
+                  class: "chip ghost",
+                  onClick: _cache[8] || (_cache[8] = $event => (showIntro.value = !showIntro.value))
+                }, ea(showIntro.value ? "收起" : "展开"), 1 /* TEXT */)
+              ]),
+              (showIntro.value)
+                ? (r4(), ie("div", _hoisted_14$d, [
+                    ia("div", _hoisted_15$b, ea(chapter.value.intro), 1 /* TEXT */),
+                    ia("div", _hoisted_16$b, [
+                      (companions.value.length)
+                        ? (r4(), ie("button", {
+                            key: 0,
+                            class: "chip",
+                            onClick: _cache[9] || (_cache[9] = $event => (companionsOpen.value = true))
+                          }, "伴读 · 历代评点 " + ea(companions.value.length), 1 /* TEXT */))
+                        : ig("v-if", true),
+                      (poems.value.length)
+                        ? (r4(), ie("button", {
+                            key: 1,
+                            class: "chip",
+                            onClick: _cache[10] || (_cache[10] = $event => (tA(store).dialogue = { kind: 'poems', data: poems.value }))
+                          }, "后人咏史 " + ea(poems.value.length) + " 首", 1 /* TEXT */))
+                        : ig("v-if", true),
+                      (r4(true), ie(rQ, null, lj(campaigns.value, (c) => {
+                        return (r4(), ie("button", {
+                          key: c.id,
+                          class: "chip red",
+                          onClick: $event => (openSandbox(c.id))
+                        }, "沙盘 · " + ea(c.name), 9 /* TEXT, PROPS */, _hoisted_17$b))
+                      }), 128 /* KEYED_FRAGMENT */)),
+                      (r4(true), ie(rQ, null, lj(hsMap.value, (m) => {
+                        return (r4(), ie("button", {
+                          key: m.hanshu.join(),
+                          class: "chip",
+                          onClick: $event => (tA(go)('/library/' + m.hanshu[0]))
+                        }, " 《汉书》" + ea(m.hanshu.map(hsTitle).join("、")), 9 /* TEXT, PROPS */, _hoisted_18$a))
+                      }), 128 /* KEYED_FRAGMENT */)),
+                      ia("button", {
+                        class: "chip ghost",
+                        onClick: _cache[11] || (_cache[11] = $event => (notesOpen.value = true))
+                      }, "注释 " + ea(notes.value.length) + " 条", 1 /* TEXT */)
+                    ])
+                  ]))
+                : ig("v-if", true)
+            ]))
+          : ig("v-if", true),
+        (r4(true), ie(rQ, null, lj(paras.value, (p, i) => {
+          return (r4(), ie("div", {
+            id: 'p-' + (i + 1),
+            key: i,
+            class: Y(["pblock", { taishigong: isTaishi(p.sec) }])
+          }, [
+            (secChanged(i) && p.sec)
+              ? (r4(), ie("div", _hoisted_20$8, ea(p.sec), 1 /* TEXT */))
+              : ig("v-if", true),
+            ia("div", _hoisted_21$8, [
+              ia("button", {
+                class: Y(["chip plain", { fav: tA(isFavorite)(Number(__props.route.no), i + 1) }]),
+                onClick: oa($event => (tA(toggleFavorite)(Number(__props.route.no), i + 1, p.o)), ["stop"])
+              }, ea(tA(isFavorite)(Number(__props.route.no), i + 1) ? "★ 已收藏" : "☆ 收藏"), 11 /* TEXT, CLASS, PROPS */, _hoisted_22$7),
+              (notesIn(p.o).length)
+                ? (r4(), ie("button", {
+                    key: 0,
+                    class: "chip",
+                    onClick: oa($event => (tA(store).dialogue = { kind: 'notes', data: notesIn(p.o) }), ["stop"])
+                  }, " 注 " + ea(notesIn(p.o).length), 9 /* TEXT, PROPS */, _hoisted_23$7))
+                : ig("v-if", true),
+              (hsLinks.value[i + 1])
+                ? (r4(), ie("button", {
+                    key: 1,
+                    class: "chip red",
+                    onClick: oa($event => (openHanshu(i + 1)), ["stop"])
+                  }, " 资料 " + ea(hsLinks.value[i + 1].length), 9 /* TEXT, PROPS */, _hoisted_24$6))
+                : ig("v-if", true),
+              (r4(true), ie(rQ, null, lj(sandboxPlacesIn(p.o), (nm) => {
+                return (r4(), ie("button", {
+                  key: nm,
+                  class: "chip red",
+                  onClick: oa($event => (openPlaceByName(nm)), ["stop"])
+                }, " 沙盘 · " + ea(nm), 9 /* TEXT, PROPS */, _hoisted_25$5))
+              }), 128 /* KEYED_FRAGMENT */)),
+              (annCount(i + 1))
+                ? (r4(), ie("button", {
+                    key: 2,
+                    class: "chip ann-chip",
+                    onClick: oa($event => (openAnnPop(i + 1, $event)), ["stop"])
+                  }, " ✎ 批注 " + ea(annCount(i + 1)), 9 /* TEXT, PROPS */, _hoisted_26$5))
+                : ig("v-if", true),
+              (r4(true), ie(rQ, null, lj(personsIn(p.o).slice(0, 2), (e) => {
+                return (r4(), ie("button", {
+                  key: e.id,
+                  class: "chip",
+                  onClick: oa($event => (openPerson(e.id)), ["stop"])
+                }, ea(e.name), 9 /* TEXT, PROPS */, _hoisted_27$5))
+              }), 128 /* KEYED_FRAGMENT */)),
+              (poems.value.length)
+                ? (r4(), ie("button", {
+                    key: 3,
+                    class: "chip ghost",
+                    onClick: _cache[12] || (_cache[12] = oa($event => (tA(store).dialogue = { kind: 'poems', data: poems.value }), ["stop"]))
+                  }, "诗词"))
+                : ig("v-if", true),
+              ia("button", {
+                class: "chip plain",
+                onClick: oa($event => (copyLink(i)), ["stop"])
+              }, "复制本段", 8 /* PROPS */, _hoisted_28$4),
+              _cache[37] || (_cache[37] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+              ia("span", _hoisted_29$4, ea(i + 1), 1 /* TEXT */)
+            ]),
+            ia("div", _hoisted_30$4, [
+              ia("div", _hoisted_31$4, [
+                ia("div", {
+                  class: "text-orig pinyin",
+                  innerHTML: render(p, i)
+                }, null, 8 /* PROPS */, _hoisted_32$4)
+              ]),
+              ia("div", _hoisted_33$3, [
+                (p.t)
+                  ? (r4(), ie("div", _hoisted_34$2, ea(p.t), 1 /* TEXT */))
+                  : (r4(), ie("div", _hoisted_35$2, "（本篇此段暂无译文）"))
+              ])
+            ])
+          ], 10 /* CLASS, PROPS */, _hoisted_19$a))
+        }), 128 /* KEYED_FRAGMENT */)),
+        (!paras.value.length)
+          ? (r4(), ie("div", _hoisted_36$2, " 本篇为表谱之体，正文以表格呈现，暂未收录分段原文。 "))
+          : ig("v-if", true),
+        (chapter.value && chapter.value.extra && chapter.value.extra.length)
+          ? (r4(), ie("div", _hoisted_37$1, [
+              (r4(true), ie(rQ, null, lj(chapter.value.extra, (ex, i) => {
+                return (r4(), ie("div", {
+                  key: i,
+                  class: "panel",
+                  style: {"margin-bottom":"12px"}
+                }, [
+                  ia("div", _hoisted_38$1, [
+                    ia("b", null, ea(ex.title), 1 /* TEXT */)
+                  ]),
+                  ia("div", _hoisted_39$1, [
+                    ia("div", {
+                      class: "md",
+                      innerHTML: tA(renderMD)(ex.text.slice(0, 2400))
+                    }, null, 8 /* PROPS */, _hoisted_40$1)
+                  ])
+                ]))
+              }), 128 /* KEYED_FRAGMENT */))
+            ]))
+          : ig("v-if", true),
+        ia("div", _hoisted_41$1, [
+          ia("div", _hoisted_42$1, [
+            _cache[38] || (_cache[38] = ia("b", null, "本篇注释", -1 /* CACHED */)),
+            ia("span", _hoisted_43$1, ea(notes.value.length) + " 条", 1 /* TEXT */),
+            ia("button", {
+              class: "chip ghost",
+              onClick: _cache[13] || (_cache[13] = $event => (notesOpen.value = !notesOpen.value))
+            }, ea(notesOpen.value ? "收起" : "展开"), 1 /* TEXT */)
+          ]),
+          (notesOpen.value)
+            ? (r4(), ie("div", _hoisted_44$1, [
+                (r4(true), ie(rQ, null, lj(notes.value, (n) => {
+                  return (r4(), ie("div", {
+                    key: n.n,
+                    style: {"padding":"7px 0","border-bottom":"1px dashed var(--line-2)"}
+                  }, [
+                    ia("b", _hoisted_45$1, ea(n.n) + ". " + ea(n.term), 1 /* TEXT */),
+                    ia("span", _hoisted_46$1, " — " + ea(n.text), 1 /* TEXT */)
+                  ]))
+                }), 128 /* KEYED_FRAGMENT */))
+              ]))
+            : ig("v-if", true)
+        ]),
+        ia("div", _hoisted_47$1, [
+          (prevNo.value)
+            ? (r4(), ie("button", {
+                key: 0,
+                class: "btn",
+                onClick: _cache[14] || (_cache[14] = $event => (tA(openChapter)(prevNo.value)))
+              }, "← 上一篇 · " + ea(prevTitle.value), 1 /* TEXT */))
+            : ig("v-if", true),
+          _cache[39] || (_cache[39] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+          (nextNo.value)
+            ? (r4(), ie("button", {
+                key: 1,
+                class: "btn primary",
+                onClick: _cache[15] || (_cache[15] = $event => (tA(openChapter)(nextNo.value)))
+              }, "下一篇 · " + ea(nextTitle.value) + " →", 1 /* TEXT */))
+            : ig("v-if", true)
+        ])
+      ]),
+      (annPop.value)
+        ? (r4(), ie("div", {
+            key: 0,
+            class: "annot-pop",
+            style: G(annPopStyle.value),
+            onClick: _cache[20] || (_cache[20] = oa(() => {}, ["stop"]))
+          }, [
+            ia("div", _hoisted_48$1, [
+              _cache[40] || (_cache[40] = ia("b", { style: {"font-family":"var(--serif)"} }, "我的批注", -1 /* CACHED */)),
+              ia("span", _hoisted_49$1, "第 " + ea(annPop.value.para) + " 段 · " + ea(annPop.value.items.length) + " 条", 1 /* TEXT */),
+              ia("button", {
+                class: "icon-btn",
+                style: {"margin-left":"auto"},
+                onClick: _cache[16] || (_cache[16] = $event => (annPop.value = null))
+              }, "✕")
+            ]),
+            (r4(true), ie(rQ, null, lj(annPop.value.items, (a) => {
+              return (r4(), ie("div", {
+                key: a.id,
+                class: "ann-mini"
+              }, [
+                ia("div", {
+                  class: Y(["annot-quote", a.color])
+                }, "「" + ea(a.quote) + "」", 3 /* TEXT, CLASS */),
+                (editingAnn.value === a.id)
+                  ? (r4(), ie(rQ, { key: 0 }, [
+                      nu(ia("textarea", {
+                        "onUpdate:modelValue": _cache[17] || (_cache[17] = $event => ((editingText).value = $event)),
+                        class: "annot-edit",
+                        placeholder: "批注内容"
+                      }, null, 512 /* NEED_PATCH */), [
+                        [s4, editingText.value]
+                      ]),
+                      ia("div", _hoisted_50$1, [
+                        ia("button", {
+                          class: "btn sm primary",
+                          onClick: $event => (saveAnnEdit(a))
+                        }, "保存", 8 /* PROPS */, _hoisted_51$1),
+                        ia("button", {
+                          class: "btn sm",
+                          onClick: _cache[18] || (_cache[18] = $event => (editingAnn.value = null))
+                        }, "取消")
+                      ])
+                    ], 64 /* STABLE_FRAGMENT */))
+                  : (r4(), ie(rQ, { key: 1 }, [
+                      (a.note)
+                        ? (r4(), ie("div", _hoisted_52$1, ea(a.note), 1 /* TEXT */))
+                        : ig("v-if", true),
+                      ia("div", _hoisted_53, [
+                        ia("button", {
+                          class: "chip ghost",
+                          onClick: $event => {editingAnn.value = a.id; editingText.value = a.note || '';}
+                        }, ea(a.note ? "编辑" : "补写"), 9 /* TEXT, PROPS */, _hoisted_54),
+                        ia("button", {
+                          class: "chip ghost",
+                          onClick: $event => (delAnn(a))
+                        }, "删除", 8 /* PROPS */, _hoisted_55),
+                        ia("button", {
+                          class: "chip ghost",
+                          onClick: _cache[19] || (_cache[19] = $event => {_ctx.annOpen = true; annPop.value = null;})
+                        }, "全部批注")
+                      ])
+                    ], 64 /* STABLE_FRAGMENT */))
+              ]))
+            }), 128 /* KEYED_FRAGMENT */))
+          ], 4 /* STYLE */))
+        : ig("v-if", true),
+      (sel.value)
+        ? (r4(), ie("div", {
+            key: 1,
+            class: "annot-pop",
+            style: G(selStyle.value),
+            onClick: _cache[23] || (_cache[23] = oa(() => {}, ["stop"]))
+          }, [
+            ia("div", _hoisted_56, " 「" + ea(sel.value.text.slice(0, 42)) + ea(sel.value.text.length > 42 ? "…" : "") + "」 ", 1 /* TEXT */),
+            nu(ia("textarea", {
+              "onUpdate:modelValue": _cache[21] || (_cache[21] = $event => ((annotText).value = $event)),
+              placeholder: "写下批注（可不填，仅划线）"
+            }, null, 512 /* NEED_PATCH */), [
+              [s4, annotText.value]
+            ]),
+            ia("div", _hoisted_57, [
+              (r4(), ie(rQ, null, lj(['hl-y', 'hl-g', 'hl-b', 'hl-p'], (c) => {
+                return ia("span", {
+                  key: c,
+                  class: Y(["swatch", [c, { on: annotColor.value === c }]]),
+                  onClick: $event => (annotColor.value = c)
+                }, null, 10 /* CLASS, PROPS */, _hoisted_58)
+              }), 64 /* STABLE_FRAGMENT */)),
+              _cache[41] || (_cache[41] = ia("span", { style: {"flex":"1"} }, null, -1 /* CACHED */)),
+              ia("button", {
+                class: "btn sm",
+                onClick: _cache[22] || (_cache[22] = $event => (sel.value = null))
+              }, "取消"),
+              ia("button", {
+                class: "btn sm primary",
+                onClick: saveAnnotation
+              }, "保存批注")
+            ])
+          ], 4 /* STYLE */))
+        : ig("v-if", true),
+      (notePop.value)
+        ? (r4(), ie("div", {
+            key: 2,
+            class: "annot-pop",
+            style: G(noteStyle.value),
+            onClick: _cache[24] || (_cache[24] = oa(() => {}, ["stop"]))
+          }, [
+            ia("div", _hoisted_59, "注 " + ea(notePop.value.n), 1 /* TEXT */),
+            ia("b", _hoisted_60, ea(notePop.value.term), 1 /* TEXT */),
+            ia("div", _hoisted_61, ea(notePop.value.text), 1 /* TEXT */)
+          ], 4 /* STYLE */))
+        : ig("v-if", true)
+    ], 32 /* NEED_HYDRATION */),
+    (companionsOpen.value)
+      ? (r4(), ie("div", {
+          key: 0,
+          class: "overlay",
+          onClick: _cache[26] || (_cache[26] = oa($event => (companionsOpen.value = false), ["self"]))
+        }, [
+          ia("div", _hoisted_62, [
+            ia("div", _hoisted_63, [
+              ia("b", null, "伴读 · " + ea(chapter.value ? chapter.value.title : ""), 1 /* TEXT */),
+              _cache[42] || (_cache[42] = ia("span", { style: {"font-size":"11.5px","color":"var(--muted)"} }, "订阅伴读者的公开批注", -1 /* CACHED */)),
+              ia("button", {
+                class: "icon-btn",
+                style: {"margin-left":"auto"},
+                onClick: _cache[25] || (_cache[25] = $event => (companionsOpen.value = false))
+              }, "✕")
+            ]),
+            ia("div", _hoisted_64, [
+              (r4(true), ie(rQ, null, lj(companions.value, (c) => {
+                return (r4(), ie("div", {
+                  key: c.id,
+                  style: {"padding":"12px 0","border-bottom":"1px dashed var(--line-2)"}
+                }, [
+                  ia("div", _hoisted_65, [
+                    ia("span", _hoisted_66, ea(c.author), 1 /* TEXT */),
+                    ia("span", _hoisted_67, ea(c.source), 1 /* TEXT */),
+                    ia("span", _hoisted_68, ea(c.kind), 1 /* TEXT */)
+                  ]),
+                  ia("div", _hoisted_69, ea(c.text), 1 /* TEXT */)
+                ]))
+              }), 128 /* KEYED_FRAGMENT */)),
+              (!companions.value.length)
+                ? (r4(), ie("div", _hoisted_70, "本篇暂无伴读评点。"))
+                : ig("v-if", true)
+            ])
+          ])
+        ]))
+      : ig("v-if", true),
+    (annotOpen.value)
+      ? (r4(), it(AnnotationPanel, {
+          key: 1,
+          chapter: Number(__props.route.no),
+          onClose: _cache[27] || (_cache[27] = $event => (annotOpen.value = false))
+        }, null, 8 /* PROPS */, ["chapter"]))
+      : ig("v-if", true),
+    (hsDrawer.value)
+      ? (r4(), ie("div", {
+          key: 2,
+          class: "overlay",
+          onClick: _cache[29] || (_cache[29] = oa($event => (hsDrawer.value = null), ["self"]))
+        }, [
+          ia("div", _hoisted_71, [
+            ia("div", _hoisted_72, [
+              _cache[43] || (_cache[43] = ia("b", null, "资料库 · 《汉书》对照", -1 /* CACHED */)),
+              ia("span", _hoisted_73, "《史记》第 " + ea(hsDrawer.value.para) + " 段 · 互见 " + ea(hsDrawer.value.items.length) + " 条", 1 /* TEXT */),
+              ia("button", {
+                class: "icon-btn",
+                style: {"margin-left":"auto"},
+                onClick: _cache[28] || (_cache[28] = $event => (hsDrawer.value = null))
+              }, "✕")
+            ]),
+            ia("div", _hoisted_74, [
+              (hsLoading.value)
+                ? (r4(), ie("div", _hoisted_75, "正在翻检《汉书》……"))
+                : ig("v-if", true),
+              (r4(true), ie(rQ, null, lj(hsDrawer.value.items, (it, i) => {
+                return (r4(), ie("div", {
+                  key: i,
+                  class: "hs-item"
+                }, [
+                  ia("div", _hoisted_76, [
+                    ia("a", {
+                      onClick: $event => (tA(go)('/library/' + it.id + '/' + (it.p + 1)))
+                    }, "《汉书·" + ea(it.title) + "》第 " + ea(it.p + 1) + " 段", 9 /* TEXT, PROPS */, _hoisted_77),
+                    _cache[44] || (_cache[44] = ia("span", { style: {"margin-left":"auto","font-size":"11px","color":"var(--muted)"} }, "原文", -1 /* CACHED */))
+                  ]),
+                  ia("div", _hoisted_78, ea(it.text), 1 /* TEXT */),
+                  (it.trans)
+                    ? (r4(), ie("div", _hoisted_79, ea(it.trans), 1 /* TEXT */))
+                    : ig("v-if", true)
+                ]))
+              }), 128 /* KEYED_FRAGMENT */)),
+              _cache[45] || (_cache[45] = ia("div", {
+                class: "desc",
+                style: {"margin-top":"10px","color":"var(--muted)","font-size":"11.5px"}
+              }, " 对照由人物、地名共现自动匹配，仅供互见参考；两书叙事详略与书法不同，正可互参。 ", -1 /* CACHED */))
+            ])
+          ])
+        ]))
+      : ig("v-if", true)
+  ], 64 /* STABLE_FRAGMENT */))
+}
+}
+
+};
+
+const _hoisted_1$f = { class: "page" };
+const _hoisted_2$f = { class: "filters" };
+const _hoisted_3$f = ["onClick"];
+const _hoisted_4$f = { class: "grid-cards" };
+const _hoisted_5$f = ["onClick"];
+const _hoisted_6$f = { class: "pill-row" };
+const _hoisted_7$f = { class: "meta" };
+const _hoisted_8$f = {
+  class: "modal",
+  style: {"width":"720px"}
+};
+const _hoisted_9$f = { class: "modal-head" };
+const _hoisted_10$e = { style: {"font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_11$e = { class: "modal-body" };
+const _hoisted_12$e = {
+  class: "desc",
+  style: {"font-family":"var(--serif)","font-size":"14.5px","line-height":"2"}
+};
+const _hoisted_13$d = { class: "rel-list" };
+const _hoisted_14$c = ["onClick"];
+const _hoisted_15$a = { class: "rel-list" };
+const _hoisted_16$a = ["title", "onClick"];
+const _hoisted_17$a = {
+  key: 0,
+  class: "ty"
+};
+
+
+var EventsView = {
+  __name: 'EventsView',
+  props: { route: { type: Object, default: () => ({}) } },
+  setup(__props) {
+
+const props = __props;
+const kw = tx("");
+const period = tx("全部");
+
+const events = iD(() => store.events?.events || []);
+const periods = iD(() => ["全部", ...new Set(events.value.map((e) => e.period).filter(Boolean))]);
+const list = iD(() =>
+  events.value.filter((e) =>
+    (period.value === "全部" || e.period === period.value) &&
+    (!kw.value.trim() || e.name.includes(kw.value) || (e.summary || "").includes(kw.value) || (e.keyFigures || []).some((k) => k.includes(kw.value)))
+  )
+);
+const detail = iD(() => events.value.find((e) => e.id === props.route.id) || null);
+function open(e) { go("/events/" + e.id); }
+function close() { go("/events"); }
+function jump(no) { go(`/c/${no}`); }
+
+/** 人物名（含别名）→ 人物 id，用于「关键人物」跳转 */
+const personIndex = iD(() => {
+  const m = new Map();
+  for (const p of store.people?.people || []) {
+    for (const n of [p.name, ...(p.aliases || [])]) if (n && !m.has(n)) m.set(n, p.id);
+  }
+  return m;
+});
+function openFigure(name) {
+  const id = personIndex.value.get(name);
+  close();
+  if (id) go("/people/" + id);
+  else go("/people");
+}
+
+return (_ctx, _cache) => {
+  return (r4(), ie("div", _hoisted_1$f, [
+    _cache[4] || (_cache[4] = ia("div", { class: "page-head" }, [
+      ia("h2", null, "纪事本末"),
+      ia("p", null, "《史记》是纪传体，一事的始末散落在本纪、世家、列传之间。此处按「事」重新打包，可集中看完一件大事的来龙去脉。")
+    ], -1 /* CACHED */)),
+    ia("div", _hoisted_2$f, [
+      nu(ia("input", {
+        "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ((kw).value = $event)),
+        class: "search-input",
+        style: {"max-width":"260px"},
+        placeholder: "搜索事件、人物"
+      }, null, 512 /* NEED_PATCH */), [
+        [s4, kw.value]
+      ]),
+      (r4(true), ie(rQ, null, lj(periods.value, (p) => {
+        return (r4(), ie("button", {
+          key: p,
+          class: Y(["filter-pill", { on: period.value === p }]),
+          onClick: $event => (period.value = p)
+        }, ea(p), 11 /* TEXT, CLASS, PROPS */, _hoisted_3$f))
+      }), 128 /* KEYED_FRAGMENT */))
+    ]),
+    ia("div", _hoisted_4$f, [
+      (r4(true), ie(rQ, null, lj(list.value, (e) => {
+        return (r4(), ie("div", {
+          key: e.id,
+          class: "item-card",
+          onClick: $event => (open(e))
+        }, [
+          ia("h4", null, ea(e.name), 1 /* TEXT */),
+          ia("p", null, ea(e.summary), 1 /* TEXT */),
+          ia("div", _hoisted_6$f, [
+            (r4(true), ie(rQ, null, lj((e.keyFigures || []).slice(0, 4), (k) => {
+              return (r4(), ie("span", {
+                key: k,
+                class: "mini-pill"
+              }, ea(k), 1 /* TEXT */))
+            }), 128 /* KEYED_FRAGMENT */))
+          ]),
+          ia("div", _hoisted_7$f, [
+            ia("span", null, ea(e.period), 1 /* TEXT */),
+            ia("span", null, "涉及 " + ea((e.chapters || []).length) + " 篇", 1 /* TEXT */)
+          ])
+        ], 8 /* PROPS */, _hoisted_5$f))
+      }), 128 /* KEYED_FRAGMENT */))
+    ]),
+    (detail.value)
+      ? (r4(), ie("div", {
+          key: 0,
+          class: "overlay",
+          onClick: oa(close, ["self"])
+        }, [
+          ia("div", _hoisted_8$f, [
+            ia("div", _hoisted_9$f, [
+              ia("b", null, ea(detail.value.name), 1 /* TEXT */),
+              ia("span", _hoisted_10$e, ea(detail.value.period), 1 /* TEXT */),
+              ia("button", {
+                class: "icon-btn",
+                style: {"margin-left":"auto"},
+                onClick: close
+              }, "✕")
+            ]),
+            ia("div", _hoisted_11$e, [
+              ia("div", _hoisted_12$e, ea(detail.value.summary), 1 /* TEXT */),
+              _cache[1] || (_cache[1] = ia("div", { class: "divider" }, null, -1 /* CACHED */)),
+              _cache[2] || (_cache[2] = ia("div", { class: "rel-group-title" }, "涉及篇目", -1 /* CACHED */)),
+              ia("div", _hoisted_13$d, [
+                (r4(true), ie(rQ, null, lj(detail.value.chapters, (no) => {
+                  return (r4(), ie("span", {
+                    key: no,
+                    class: "rel-pill",
+                    onClick: $event => {close(); jump(no);}
+                  }, " 卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_14$c))
+                }), 128 /* KEYED_FRAGMENT */))
+              ]),
+              _cache[3] || (_cache[3] = ia("div", {
+                class: "rel-group-title",
+                style: {"margin-top":"12px"}
+              }, "关键人物", -1 /* CACHED */)),
+              ia("div", _hoisted_15$a, [
+                (r4(true), ie(rQ, null, lj(detail.value.keyFigures || [], (k) => {
+                  return (r4(), ie("span", {
+                    key: k,
+                    class: "rel-pill",
+                    title: personIndex.value.get(k) ? '查看' + k + '的人物页' : k + '（暂无人物页）',
+                    onClick: oa($event => (openFigure(k)), ["stop"])
+                  }, [
+                    id(ea(k), 1 /* TEXT */),
+                    (personIndex.value.get(k))
+                      ? (r4(), ie("span", _hoisted_17$a, "人物"))
+                      : ig("v-if", true)
+                  ], 8 /* PROPS */, _hoisted_16$a))
+                }), 128 /* KEYED_FRAGMENT */))
+              ])
+            ])
+          ])
+        ]))
+      : ig("v-if", true)
+  ]))
+}
+}
+
+};
+
+const _hoisted_1$e = { class: "page" };
+const _hoisted_2$e = { class: "page-head" };
+const _hoisted_3$e = { style: {"margin-top":"10px"} };
+const _hoisted_4$e = { class: "tagline" };
+const _hoisted_5$e = { class: "tagline" };
+const _hoisted_6$e = {
+  key: 0,
+  class: "tagline"
+};
+const _hoisted_7$e = {
+  key: 1,
+  class: "tagline"
+};
+const _hoisted_8$e = { style: {"display":"grid","grid-template-columns":"1fr 340px","gap":"18px","align-items":"start"} };
+const _hoisted_9$e = { class: "panel" };
+const _hoisted_10$d = { class: "panel-body" };
+const _hoisted_11$d = {
+  class: "desc",
+  style: {"font-family":"var(--serif)","font-size":"15px","line-height":"2"}
+};
+const _hoisted_12$d = {
+  class: "panel",
+  style: {"margin-top":"12px"}
+};
+const _hoisted_13$c = { class: "panel-head" };
+const _hoisted_14$b = { style: {"margin-left":"auto","font-size":"11.5px","color":"var(--muted)"} };
+const _hoisted_15$9 = {
+  class: "panel-body",
+  style: {"max-height":"420px","overflow":"auto"}
+};
+const _hoisted_16$9 = ["onClick"];
+const _hoisted_17$9 = { class: "mh" };
+const _hoisted_18$9 = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_19$9 = { class: "panel" };
+const _hoisted_20$7 = { class: "panel-body" };
+const _hoisted_21$7 = { class: "rel-group-title" };
+const _hoisted_22$6 = { class: "rel-list" };
+const _hoisted_23$6 = ["onClick"];
+const _hoisted_24$5 = { class: "ty" };
+const _hoisted_25$4 = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+const _hoisted_26$4 = {
+  class: "panel",
+  style: {"margin-top":"12px"}
+};
+const _hoisted_27$4 = { class: "panel-body" };
+const _hoisted_28$3 = { class: "rel-list" };
+const _hoisted_29$3 = ["onClick"];
+const _hoisted_30$3 = { class: "filters" };
+const _hoisted_31$3 = ["onClick"];
+const _hoisted_32$3 = { class: "rel-group-title" };
+const _hoisted_33$2 = { class: "grid-cards" };
+const _hoisted_34$1 = ["onClick"];
+const _hoisted_35$1 = { class: "meta" };
+const _hoisted_36$1 = {
+  key: 0,
+  class: "desc",
+  style: {"color":"var(--muted)"}
+};
+
+
+var PeopleView = {
+  __name: 'PeopleView',
+  props: { route: { type: Object, default: () => ({}) } },
+  setup(__props) {
+
+const props = __props;
+const kw = tx("");
+const dynasty = tx("全部");
+const people = iD(() => store.people?.people || []);
+const dynasties = iD(() => ["全部", ...new Set(people.value.map((p) => p.dynasty).filter(Boolean))]);
+
+const person = iD(() => (props.route.id ? personById(props.route.id) : null));
+
+const list = iD(() =>
+  people.value.filter(
+    (p) =>
+      (dynasty.value === "全部" || p.dynasty === dynasty.value) &&
+      (!kw.value.trim() || p.name.includes(kw.value) || (p.aliases || []).some((a) => a.includes(kw.value)) || (p.identity || "").includes(kw.value))
+  )
+);
+
+const groups = iD(() => {
+  const m = new Map();
+  for (const p of list.value) {
+    if (!m.has(p.dynasty)) m.set(p.dynasty, []);
+    m.get(p.dynasty).push(p);
+  }
+  return [...m.entries()];
+});
+
+const relGroups = iD(() => {
+  if (!person.value) return [];
+  const g = {};
+  for (const r of person.value.relations || []) {
+    const t = personById(r.target);
+    if (!t) continue;
+    (g[r.type] = g[r.type] || []).push({ ...r, target: t });
+  }
+  return Object.entries(g);
+});
+
+const mentions = tx([]);
+ny(person, async () => {
+  mentions.value = [];
+  if (!person.value) return;
+  if (!window.__searchIndex) window.__searchIndex = await fetchJSON("search.json");
+  const names = [person.value.name, ...(person.value.aliases || [])];
+  const out = [];
+  for (const row of window.__searchIndex) {
+    const o = plainText(row.o);
+    if (names.some((n) => o.includes(n))) { out.push(row); if (out.length >= 30) break; }
+  }
+  mentions.value = out;
+}, { immediate: true });
+
+function jump(id) { go("/people/" + id); }
+function openCh(no, p) { openChapter(no, p); }
+
+return (_ctx, _cache) => {
+  return (r4(), ie("div", _hoisted_1$e, [
+    ig(" 人物详情 "),
+    (person.value)
+      ? (r4(), ie(rQ, { key: 0 }, [
+          ia("div", _hoisted_2$e, [
+            ia("button", {
+              class: "chip ghost",
+              onClick: _cache[0] || (_cache[0] = $event => (tA(go)('/people')))
+            }, "← 人物志"),
+            ia("h2", _hoisted_3$e, ea(person.value.name), 1 /* TEXT */),
+            ia("p", null, [
+              ia("span", _hoisted_4$e, ea(person.value.dynasty), 1 /* TEXT */),
+              ia("span", _hoisted_5$e, ea(person.value.identity), 1 /* TEXT */),
+              (person.value.years)
+                ? (r4(), ie("span", _hoisted_6$e, ea(person.value.years), 1 /* TEXT */))
+                : ig("v-if", true),
+              (person.value.aliases?.length)
+                ? (r4(), ie("span", _hoisted_7$e, "别名：" + ea(person.value.aliases.join("、")), 1 /* TEXT */))
+                : ig("v-if", true)
+            ])
+          ]),
+          ia("div", _hoisted_8$e, [
+            ia("div", null, [
+              ia("div", _hoisted_9$e, [
+                _cache[2] || (_cache[2] = ia("div", { class: "panel-head" }, [
+                  ia("b", null, "小传")
+                ], -1 /* CACHED */)),
+                ia("div", _hoisted_10$d, [
+                  ia("div", _hoisted_11$d, ea(person.value.desc), 1 /* TEXT */)
+                ])
+              ]),
+              ia("div", _hoisted_12$d, [
+                ia("div", _hoisted_13$c, [
+                  _cache[3] || (_cache[3] = ia("b", null, "出现段落聚合", -1 /* CACHED */)),
+                  ia("span", _hoisted_14$b, ea(mentions.value.length) + " 段", 1 /* TEXT */)
+                ]),
+                ia("div", _hoisted_15$9, [
+                  (r4(true), ie(rQ, null, lj(mentions.value, (m) => {
+                    return (r4(), ie("div", {
+                      key: m.c + '-' + m.p,
+                      class: "mention",
+                      onClick: $event => (openCh(m.c, m.p))
+                    }, [
+                      ia("div", _hoisted_17$9, "卷" + ea(m.c) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === m.c)?.title) + " · 第 " + ea(m.p) + " 段", 1 /* TEXT */),
+                      id(" " + ea(tA(plainText)(m.o).slice(0, 90)) + "… ", 1 /* TEXT */)
+                    ], 8 /* PROPS */, _hoisted_16$9))
+                  }), 128 /* KEYED_FRAGMENT */)),
+                  (!mentions.value.length)
+                    ? (r4(), ie("div", _hoisted_18$9, "未检索到出现段落。"))
+                    : ig("v-if", true)
+                ])
+              ])
+            ]),
+            ia("div", null, [
+              ia("div", _hoisted_19$9, [
+                _cache[4] || (_cache[4] = ia("div", { class: "panel-head" }, [
+                  ia("b", null, "人物关系")
+                ], -1 /* CACHED */)),
+                ia("div", _hoisted_20$7, [
+                  (r4(true), ie(rQ, null, lj(relGroups.value, ([type, arr]) => {
+                    return (r4(), ie("div", {
+                      key: type,
+                      class: "rel-group"
+                    }, [
+                      ia("div", _hoisted_21$7, ea(type), 1 /* TEXT */),
+                      ia("div", _hoisted_22$6, [
+                        (r4(true), ie(rQ, null, lj(arr, (r) => {
+                          return (r4(), ie("span", {
+                            key: r.target.id + type,
+                            class: "rel-pill",
+                            onClick: $event => (jump(r.target.id))
+                          }, [
+                            id(ea(r.target.name), 1 /* TEXT */),
+                            ia("span", _hoisted_24$5, ea(r.label), 1 /* TEXT */)
+                          ], 8 /* PROPS */, _hoisted_23$6))
+                        }), 128 /* KEYED_FRAGMENT */))
+                      ])
+                    ]))
+                  }), 128 /* KEYED_FRAGMENT */)),
+                  (!relGroups.value.length)
+                    ? (r4(), ie("div", _hoisted_25$4, "暂无关系数据。"))
+                    : ig("v-if", true)
+                ])
+              ]),
+              ia("div", _hoisted_26$4, [
+                _cache[5] || (_cache[5] = ia("div", { class: "panel-head" }, [
+                  ia("b", null, "相关篇目")
+                ], -1 /* CACHED */)),
+                ia("div", _hoisted_27$4, [
+                  ia("div", _hoisted_28$3, [
+                    (r4(true), ie(rQ, null, lj(person.value.chapters, (no) => {
+                      return (r4(), ie("span", {
+                        key: no,
+                        class: "rel-pill",
+                        onClick: $event => (openCh(no))
+                      }, " 卷" + ea(no) + " · " + ea(tA(store).index?.chapters.find((c) => c.no === no)?.title), 9 /* TEXT, PROPS */, _hoisted_29$3))
+                    }), 128 /* KEYED_FRAGMENT */))
+                  ])
+                ])
+              ])
+            ])
+          ])
+        ], 64 /* STABLE_FRAGMENT */))
+      : (r4(), ie(rQ, { key: 1 }, [
+          ig(" 人物列表 "),
+          _cache[6] || (_cache[6] = ia("div", { class: "page-head" }, [
+            ia("h2", null, "人物志"),
+            ia("p", null, "《史记》首创纪传体，以人系事。这里把散见各篇的人物抽出，附小传、关系与出场段落——读编年史易忘人，读列传易忘时，人物志可补两者之阙。")
+          ], -1 /* CACHED */)),
+          ia("div", _hoisted_30$3, [
+            nu(ia("input", {
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ((kw).value = $event)),
+              class: "search-input",
+              style: {"max-width":"240px"},
+              placeholder: "搜索人名、别名、身份"
+            }, null, 512 /* NEED_PATCH */), [
+              [s4, kw.value]
+            ]),
+            (r4(true), ie(rQ, null, lj(dynasties.value, (d) => {
+              return (r4(), ie("button", {
+                key: d,
+                class: Y(["filter-pill", { on: dynasty.value === d }]),
+                onClick: $event => (dynasty.value = d)
+              }, ea(d), 11 /* TEXT, CLASS, PROPS */, _hoisted_31$3))
+            }), 128 /* KEYED_FRAGMENT */))
+          ]),
+          (r4(true), ie(rQ, null, lj(groups.value, ([d, arr]) => {
+            return (r4(), ie("div", {
+              key: d,
+              style: {"margin-bottom":"20px"}
+            }, [
+              ia("div", _hoisted_32$3, ea(d) + " · " + ea(arr.length) + " 人", 1 /* TEXT */),
+              ia("div", _hoisted_33$2, [
+                (r4(true), ie(rQ, null, lj(arr, (p) => {
+                  return (r4(), ie("div", {
+                    key: p.id,
+                    class: "item-card",
+                    onClick: $event => (jump(p.id))
+                  }, [
+                    ia("h4", null, ea(p.name), 1 /* TEXT */),
+                    ia("p", null, ea((p.desc || "").slice(0, 58)) + "…", 1 /* TEXT */),
+                    ia("div", _hoisted_35$1, [
+                      ia("span", null, ea(p.identity), 1 /* TEXT */),
+                      ia("span", null, ea((p.relations || []).length) + " 条关系", 1 /* TEXT */)
+                    ])
+                  ], 8 /* PROPS */, _hoisted_34$1))
+                }), 128 /* KEYED_FRAGMENT */))
+              ])
+            ]))
+          }), 128 /* KEYED_FRAGMENT */)),
+          (!list.value.length)
+            ? (r4(), ie("div", _hoisted_36$1, "没有找到匹配的人物。"))
+            : ig("v-if", true)
+        ], 64 /* STABLE_FRAGMENT */))
   ]))
 }
 }
@@ -6319,15 +6571,18 @@ const sTitle = (no) => store.index?.chapters.find((c) => c.no === no)?.title || 
 ny(
   () => props.route.id,
   async (id) => {
-    if (id) {
-      await loadHanshu(id);
-      if (props.route.anchor) {
-        t8(() => {
-          const el = document.getElementById("h-" + props.route.anchor);
-          if (el) el.scrollIntoView({ block: "center" });
-        });
-      } else window.scrollTo({ top: 0 });
+    if (!id) {
+      store.libraryChapter = null;
+      window.scrollTo({ top: 0 });
+      return;
     }
+    await loadHanshu(id);
+    if (props.route.anchor) {
+      t8(() => {
+        const el = document.getElementById("h-" + props.route.anchor);
+        if (el) el.scrollIntoView({ block: "center" });
+      });
+    } else window.scrollTo({ top: 0 });
   },
   { immediate: true }
 );
@@ -6515,6 +6770,18 @@ var ChangelogView = {
   setup(__props) {
 
 const entries = [
+  {
+    version: "v1.2",
+    date: "2026-10-20",
+    title: "批注上纸、沙盘入文、若干修复",
+    items: [
+      { k: "升级", t: "批注像写在纸上", d: "划线处直接出现「✎」小标，段落功能条上出现「✎ 批注 n」；点正文任何一处划线或小标，就地弹出该段批注，可当场编辑、删除、跳转全部批注，不必再进侧栏。侧栏（本篇/全部、定位、导入导出）保留。" },
+      { k: "新增", t: "沙盘接入正文", d: "地名面板内嵌该地所在的战役沙盘缩略图（含行军路线），一键进入完整推演；读到战役所在篇目时，相关段落会多出「沙盘 · 巨鹿」入口，点地名即可看地图与态势。" },
+      { k: "修复", t: "资料库返回", d: "修复从《汉书》某篇点「← 资料库」无法回到主界面的问题（章节数据未清空）。" },
+      { k: "增强", t: "纪事本末人物直达", d: "事件详情中的「关键人物」现在可点击，直接打开该人物的人物志页面（姓名、别名均可匹配）。" },
+      { k: "优化", t: "批注高亮", d: "划线改为纸质荧光笔式的下缘着色，段落内更易辨认，不遮挡文字。" },
+    ],
+  },
   {
     version: "v1.1",
     date: "2026-10-20",

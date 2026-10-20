@@ -727,3 +727,19 @@ input[type="range"] { accent-color: var(--accent); width: 130px; }
 .log-item:last-child { border-bottom: none; }
 .log-tag { display: inline-block; height: 20px; line-height: 18px; text-align: center; font-size: 11px; border: 1px solid currentColor; border-radius: 5px; }
 .log-title { font-family: var(--serif); font-size: 14.5px; color: var(--ink); letter-spacing: .3px; }
+
+/* ===== 批注：正文内联标记 ===== */
+.ann-mark {
+  font-size: 10px; color: #b07d2a; margin-left: 1px; cursor: pointer; vertical-align: super;
+  line-height: 0; opacity: .9; user-select: none;
+}
+.ann-mark:hover { color: var(--red); transform: scale(1.15); }
+.chip.ann-chip { background: #fbf3e2; border-color: #eadcc0; color: #8a6a2f; }
+.chip.ann-chip:hover { background: #b07d2a; border-color: #b07d2a; color: #fff; }
+.ann-mini { padding: 7px 0; border-bottom: 1px dashed var(--line-2); }
+.ann-mini:last-child { border-bottom: none; }
+.hl { box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.hl-y { background: linear-gradient(transparent 55%, #fbe9a8 55%); }
+.hl-g { background: linear-gradient(transparent 55%, #d8ecc8 55%); }
+.hl-b { background: linear-gradient(transparent 55%, #cfe4f7 55%); }
+.hl-p { background: linear-gradient(transparent 55%, #ecdaf3 55%); }
